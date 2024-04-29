@@ -25,7 +25,7 @@ function AdminContextProvider({ children }) {
 
   const value = {
     ...adminState,
-    isAuthenticated:true,
+    isAuthenticated: !!adminState.token,
     authenticateAdmin,
     signoutAdmin
   };

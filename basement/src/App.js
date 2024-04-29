@@ -1,4 +1,3 @@
-import "./index.css";
 import { BrowserRouter as Router } from "react-router-dom";
 import AppNavigation from "./Navigation";
 import AdminContextProvider from "./store/AdminContext";
