@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AccountModule } from './account/account.module';
@@ -6,6 +6,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { dataSourceOptions } from './dataSource.options';
+import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
+import { RBACGuard } from './guards/rbac.guard';
+import { HttpExceptionFilter } from './exceptionFilters/response.exception';
+import { TokenParse } from './middleware/token-parse.middleware';
 
 @Module({
   imports: [
@@ -27,6 +31,26 @@ import { dataSourceOptions } from './dataSource.options';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_PIPE,
+      useFactory: () => new ValidationPipe({ whitelist: true })
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RBACGuard
+    },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter
+    }
+  
+  ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer){
+    consumer.apply(TokenParse)
+      .forRoutes('*')
+  }
+}
