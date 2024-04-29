@@ -34,7 +34,6 @@ export class RBACGuard implements CanActivate{
         throw new UnauthorizedException('ACCOUNT_DOESNT_EXIST');
       }
       
-      //Still we use role which was in token
       const permission = this.checkPermission(request.decoded.role, acl.resource, acl.operation);
 
       if(!permission){
@@ -42,13 +41,6 @@ export class RBACGuard implements CanActivate{
       }
 
       request.accessType = permission.access;
-
-      /////////////////////////////////////////////////////////////////////////////////////
-      /// We could check for ownership here as well, through the controller's arguments ///
-      /// fetching, but it will take more runtime and memory processes as RBAC used     ///
-      /// frequently. So it would be better if ownership checking was done in route     ///
-      /// handlers, even if it ends up with code repeating.                             ///
-      /////////////////////////////////////////////////////////////////////////////////////
     }
 
     return true;

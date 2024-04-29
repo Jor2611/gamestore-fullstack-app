@@ -18,6 +18,7 @@ import { ConfigService } from '@nestjs/config';
     }),
   ],
   providers: [AccountService],
-  controllers: [AccountController]
+  controllers: [AccountController],
+  exports:[AccountService, TypeOrmModule]
 })
 export class AccountModule {}
