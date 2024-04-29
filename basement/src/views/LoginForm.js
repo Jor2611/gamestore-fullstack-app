@@ -10,7 +10,7 @@ import {
   Switch,
   Text,
   DarkMode,
-  ChakraProvider,
+  ChakraProvider
 } from "@chakra-ui/react";
 import theme from "../theme/themeAuth.js";
 import GradientBorder from "../components/GradientBorder/GradientBorder";
@@ -42,8 +42,6 @@ const LoginForm = () => {
     } finally {
       setSubmitting(false);
     }
-    // console.log(values);
-    setSubmitting(false);
   };
 
   return (
@@ -177,15 +175,8 @@ const LoginForm = () => {
                 </Form>
                 )}
               </Formik>
-             
             </Flex>
           </Flex>
-          <Box
-            w={{ base: "335px", md: "450px" }}
-            mx={{ base: "auto", lg: "unset" }}
-            ms={{ base: "auto", lg: "auto" }}
-            mb='80px'>
-          </Box>
           <Box
             display={{ base: "none", lg: "block" }}
             overflowX='hidden'
