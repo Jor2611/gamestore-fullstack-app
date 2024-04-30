@@ -26,12 +26,12 @@ export function SidebarResponsive({ logoText, iconColor }) {
 
   return (
     <Flex
-      display={{ sm: "flex", xl: "none" }}
+      display={{ sm: "flex", lg: "none" }}
       alignItems='center'>
       <HamburgerIcon
         color={iconColor}
-        w='18px'
-        h='18px'
+        w='25px'
+        h='25px'
         ref={btnRef}
         colorscheme='teal'
         onClick={onOpen}

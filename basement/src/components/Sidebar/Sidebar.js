@@ -13,15 +13,15 @@ function Sidebar({ logoText }) {
 
   return (
     <Box>
-      <Box display={{ sm: "none", xl: "block" }} position='fixed'>
+      <Box display={{ xs: "none", md:'none', lg: "block" }} position='fixed'>
         <Box
           bg={sidebarBg}
           backdropFilter='blur(10px)'
           transition="0.2s linear"
           w='260px'
           maxW='260px'
-          ms={{ sm: "16px" }}
-          my={{ sm: "16px" }}
+          ms={{ xs: "16px" }}
+          my={{ xs: "16px" }}
           h='calc(100vh - 32px)'
           ps='20px'
           pe='20px'

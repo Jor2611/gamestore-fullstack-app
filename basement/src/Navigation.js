@@ -7,6 +7,7 @@ import { checkToken } from './utils/http';
 import BasementLayout from './views/Basement';
 import LoginForm from './views/LoginForm';
 import Games from './views/Games/Games';
+import Orders from './views/Orders/Orders';
 
 
 export default function AppNavigation() {
@@ -54,7 +55,7 @@ export default function AppNavigation() {
       <Route path='' element={ isAdminAuth ? <BasementLayout/> : <LoginForm/> }>
         {isAdminAuth && <Route index element={<Navigate to='/games' replace/>}/>}
         {isAdminAuth && <Route path='games' element={<Games/>}/>}
-        {isAdminAuth && <Route path='orders' element={<Games/>}/>}
+        {isAdminAuth && <Route path='orders' element={<Orders/>}/>}
         <Route path='*' element={<Navigate to='/games' replace/>}/>
       </Route>
       <Route path='*' element={<Navigate to='/' replace/>}/>

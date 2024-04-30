@@ -4,18 +4,24 @@ import { Box, ChakraProvider } from '@chakra-ui/react';
 import { AdminContext } from '../store/AdminContext';
 import theme from '../theme/themeAdmin';
 import Sidebar from '../components/Sidebar/Sidebar';
-import AdminNavbar from '../components/Navbars/AdminNavbar';
+import TopNavbar from '../components/Navbar/TopNavbar';
+import MainPanel from '../components/Layout/MainPanel';
+import PanelContainer from '../components/Layout/PanelContainer';
 
 export default function BasementLayout(){
   const location = useLocation();
   const { signoutAdmin } = useContext(AdminContext);
 
   return (
-    <ChakraProvider theme={theme} w='100%'>
+    <ChakraProvider theme={theme}>
       <Box>
-        <AdminNavbar brandText={'PLAYON BASEMENT'}/>
         <Sidebar logoText={'PLAYON BASEMENT'}/>
-        <Outlet/>
+          <MainPanel w={{ base: "100%", lg: "calc(100% - 275px)" }}>
+            <TopNavbar signOut={signoutAdmin}/>
+            <PanelContainer>
+              <Outlet/>
+            </PanelContainer>
+          </MainPanel>
       </Box>
     </ChakraProvider>
   );
