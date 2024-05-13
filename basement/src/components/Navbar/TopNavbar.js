@@ -1,12 +1,13 @@
-import { Box, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Flex, Link } from '@chakra-ui/react'
-import React from 'react'
-import { TopNavLinks } from './TopNavLinks'
+import { Box, Flex, Link } from '@chakra-ui/react';
+import NavBreadCrumbs from './NavBreadCrumbs';
+import { TopNavLinks } from './TopNavLinks';
 
 const TopNavbar = ({ signOut }) => {
   return (
     <Flex
       position={'absolute'}
       borderColor='transparent'
+      bg='linear-gradient(rgba(255, 255, 255, 0) 0% rgba(255, 255, 255, 0.39) @ 100%)'
       borderWidth='1.5px'
       borderStyle='solid'
       transitionDelay='0s, 0s, 0s, 0s'
@@ -36,18 +37,7 @@ const TopNavbar = ({ signOut }) => {
         justifyContent={{ md:"space-between"}}
       >
         <Box mb={{ sm: '8px', md: '0px' }}>
-          <Breadcrumb>
-            <BreadcrumbItem color='#A0AEC0'>
-              <BreadcrumbLink href='#' color='#A0AEC0'>
-                #
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-          <BreadcrumbItem color={'#FFF'}>
-            <BreadcrumbLink href='#' color={'#FFF'}>
-              PlayOn
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          </Breadcrumb>
+          <NavBreadCrumbs/>
           <Link
             color='#FFF'
             href='#'
@@ -65,7 +55,7 @@ const TopNavbar = ({ signOut }) => {
             PlayOn
           </Link>
         </Box>
-        <Box ms='auto' >
+        <Box ms='auto'>
           <TopNavLinks signOut={signOut}/>
         </Box>
       </Flex>

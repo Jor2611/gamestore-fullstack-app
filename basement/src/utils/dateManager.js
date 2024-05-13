@@ -15,3 +15,7 @@ export const generateEventsData = (isoDate, timeZone) => {
     weekday: date.format('dddd')
   };
 };
+
+export const adaptToUpdateDate = (isoDate) => {
+  return dayjs(isoDate).format('YYYY-MM-DD (h:mm:ss A)');
+};

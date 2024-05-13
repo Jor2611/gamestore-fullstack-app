@@ -3,16 +3,19 @@ import { Navigate, Routes, Route } from 'react-router-dom';
 import { CircularProgress, Box } from '@chakra-ui/react'
 import { AdminContext } from './store/AdminContext';
 import { eventEmitter } from './utils/eventEmitter';
-import { checkToken } from './utils/http';
+import { checkToken, loadGenres, loadPlatforms } from './utils/http';
+import { LayoutContext } from './store/LayoutContext';
 import BasementLayout from './views/Basement';
 import LoginForm from './views/LoginForm';
 import Games from './views/Games/Games';
 import Orders from './views/Orders/Orders';
+import AddGame from './views/Games/AddGame';
 
 
 export default function AppNavigation() {
   const [isAdminLoading, setIsAdminLoading] = useState(true);
   const { isAuthenticated: isAdminAuth, authenticateAdmin, signoutAdmin } = useContext(AdminContext);
+  const { loadLayoutData } = useContext(LayoutContext);
 
   useEffect(() => {
     const adminToken = localStorage.getItem('admin_token');
@@ -20,7 +23,11 @@ export default function AppNavigation() {
     async function checkAuthState(token){
       try{
         const { id } = await checkToken(token);
-        authenticateAdmin({ id, token })
+        const genres = await loadGenres();
+        const platforms = await loadPlatforms();
+        
+        authenticateAdmin({ id, token });
+        loadLayoutData({ genres, platforms });
       }catch(err){
         console.log(err)
         signoutAdmin();
@@ -55,6 +62,7 @@ export default function AppNavigation() {
       <Route path='' element={ isAdminAuth ? <BasementLayout/> : <LoginForm/> }>
         {isAdminAuth && <Route index element={<Navigate to='/games' replace/>}/>}
         {isAdminAuth && <Route path='games' element={<Games/>}/>}
+        {isAdminAuth && <Route path='games/new' element={<AddGame/>}/>}
         {isAdminAuth && <Route path='orders' element={<Orders/>}/>}
         <Route path='*' element={<Navigate to='/games' replace/>}/>
       </Route>

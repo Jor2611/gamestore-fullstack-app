@@ -21,12 +21,12 @@ const SidebarNavButton = ({ icon, to, label, active }) => {
         borderRadius='15px'
         boxShadow={sidebarActiveShadow}
         bg={active ? activeBg : 'transparent'}
-        transition={active ? "0.2s linear" : 'inherit' }//try none as well
-        backdropFilter={active ? "blur(42px)" : "inherit" }//try none as well
+        transition={active ? "0.2s linear" : 'inherit' }
+        backdropFilter={active ? "blur(42px)" : "inherit" }
         mb={{ xl: "12px" }}
         mx={{ xl: "auto" }}
         ps={{ sm: "10px", xl: "16px" }}
-        _hover='none'
+        _hover={{}}//Wierd value because of chakra ui bug
         _active={{
           bg: "inherit",
           transform: "none",

@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { useLocation, Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import { Box, ChakraProvider } from '@chakra-ui/react';
 import { AdminContext } from '../store/AdminContext';
 import theme from '../theme/themeAdmin';
@@ -9,7 +9,6 @@ import MainPanel from '../components/Layout/MainPanel';
 import PanelContainer from '../components/Layout/PanelContainer';
 
 export default function BasementLayout(){
-  const location = useLocation();
   const { signoutAdmin } = useContext(AdminContext);
 
   return (
@@ -18,7 +17,7 @@ export default function BasementLayout(){
         <Sidebar logoText={'PLAYON BASEMENT'}/>
           <MainPanel w={{ base: "100%", lg: "calc(100% - 275px)" }}>
             <TopNavbar signOut={signoutAdmin}/>
-            <PanelContainer>
+            <PanelContainer >
               <Outlet/>
             </PanelContainer>
           </MainPanel>

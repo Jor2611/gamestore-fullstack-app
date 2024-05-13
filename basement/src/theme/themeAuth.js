@@ -14,6 +14,7 @@ import { MainPanelComponent } from "./additions/layout/MainPanel";
 import { PanelContentComponent } from "./additions/layout/PanelContent";
 import { PanelContainerComponent } from "./additions/layout/PanelContainer";
 
+
 export default extendTheme(
   { breakpoints }, // Breakpoints
   bgAuth, // Global styles

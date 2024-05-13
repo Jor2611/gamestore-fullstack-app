@@ -1,7 +1,7 @@
-import axiosInstance from './axiosInstance';
+import { backendAPI, rawgIOAPI } from './axiosInstances';
 import { eventEmitter } from './eventEmitter';
 
-axiosInstance.interceptors.response.use(
+backendAPI.interceptors.response.use(
   response => {
     return response;
   },
@@ -22,11 +22,14 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-const BACKEND_URL = 'http://localhost:4000';
+
+/**
+ * BACKEND endpoints
+ */
 
 export async function adminSignIn(data){
   try{
-    const response = await axiosInstance.post(`${BACKEND_URL}/account/basement/token`, data);
+    const response = await backendAPI.post(`/account/basement/token`, data);
     return response.data;
   }catch(err){
     console.log(err);
@@ -35,12 +38,92 @@ export async function adminSignIn(data){
   }
 }
 
+
 export async function checkToken(token){
   try{
-    const response = await axiosInstance.get(`${BACKEND_URL}/account/checkToken?token=Bearer ${token}`);
+    const response = await backendAPI.get(`/account/checkToken?token=Bearer ${token}`);
     return response.data;
   }catch(err){
     console.log(err);
     throw err;
   }
 }
+
+export async function fetchGames(){
+  try{
+    const response = await backendAPI.get(`/game`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}` } });
+    return response.data;
+  }catch(err){
+    console.log(err);
+    throw err;
+  }  
+}
+
+export async function createGame(data){
+  try{
+    const response = await backendAPI.post(`/game`, { ...data }, { headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}` } });
+    return response.data;
+  }catch(err){
+    console.log(err);
+    throw err;
+  }
+}
+
+export async function deleteGame(id){
+  try{
+    const response = await backendAPI.delete(`/game/${id}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}` } });
+    return response.data;
+  }catch(err){
+    console.log(err);
+    throw err;
+  }
+}
+
+export async function loadGenres(){
+  try{
+    const response = await backendAPI.get(`/genre`);
+    return response.data;
+  }catch(err){
+    console.log(err);
+    throw err;
+  }
+}
+
+
+export async function loadPlatforms(){
+  try{
+    const response = await backendAPI.get(`/platform`);
+    return response.data;
+  }catch(err){
+    console.log(err);
+    throw err;
+  }
+}
+
+
+/**
+ * RAWG.io endpoints
+ */
+
+export async function findMatchedGames(query){
+  try{
+    const response = await rawgIOAPI.get(`/games?search=${query}`);
+    return response.data.results;
+  }catch(err){
+    console.log(err);
+    throw err;
+  }
+}
+
+
+// export async function fetchPlatforms(query){
+//   try{
+//     const response = await rawgIOAPI.get(`/platforms`);
+//     console.log(response.data.results)
+//     return response.data.results;
+//   }catch(err){
+//     console.log(err);
+//     throw err;
+//   }
+// }
+

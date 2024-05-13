@@ -21,9 +21,9 @@ export const globalStyles = {
       body: {
         fontFamily: "Plus Jakarta Display",
       },
-      // "*::placeholder": {
-      //   color: "gray.400",
-      // },
+      "*::placeholder": {
+        color: "gray.400",
+      },
       html: {
         fontFamily: "Plus Jakarta Display",
       },

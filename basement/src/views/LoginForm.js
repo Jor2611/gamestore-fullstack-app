@@ -3,44 +3,34 @@ import {
   Box,
   Flex,
   Button,
-  FormControl,
-  FormLabel,
   Heading,
-  Input,
-  Switch,
   Text,
-  DarkMode,
   ChakraProvider
 } from "@chakra-ui/react";
 import theme from "../theme/themeAuth.js";
-import GradientBorder from "../components/GradientBorder/GradientBorder";
 import signInImage from "../assets/img/signInImage.png";
-import { Formik, Form, Field } from 'formik';
-import * as Yup from 'yup';
 import { AdminContext } from '../store/AdminContext';
 import { adminSignIn } from '../utils/http';
+import CustomInput from '../components/Input/CustomInput.js';
+import CustomCheckbox from '../components/Input/CustomCheckbox.js';
+import { useForm } from 'react-hook-form';
 
-const validationSchema = Yup.object().shape({
-  email: Yup.string()
-    .matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, 'Invalid Email!')
-    .required('Required'),
-  password: Yup.string().required('Required'),
-  rememberMe: Yup.boolean().notRequired()
-});
 
 
 const LoginForm = () => {
   const initialValues = { email: '', password: '', rememberMe: false };
   const adminCtx = useContext(AdminContext);
 
-  const handleSubmit = async (values, { setSubmitting }) => {
+  const { control, handleSubmit } = useForm({
+    defaultValues: initialValues
+  });
+
+  const onSubmit = async (values) => {
     try {
       const result = await adminSignIn(values);
       adminCtx.authenticateAdmin({ id: result.data.id, token: result.data.token });
     } catch (error) {
       console.error('Submission failed', error);
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -81,100 +71,45 @@ const LoginForm = () => {
                 fontSize='14px'>
                   Enter your email and password to sign in
               </Text>
-              <Formik
-                initialValues={initialValues}
-                validationSchema={validationSchema}
-                onSubmit={handleSubmit}
-              >
-                {({ isSubmitting, handleChange, values, errors, touched }) => (
-                <Form>
-                  <FormControl>
-                    <FormLabel
-                      ms='4px'
-                      fontSize='sm'
-                      fontWeight='normal'
-                      color='white'>
-                        Email
-                    </FormLabel>
-                    <GradientBorder
-                      mb='24px'
-                      w={{ base: "100%", lg: "fit-content" }}
-                      borderRadius='20px'>
-                      <Field
-                        as={Input}
-                        color='white'
-                        bg='rgb(19,21,54)'
-                        border='transparent'
-                        borderRadius='20px'
-                        fontSize='sm'
-                        size='lg'
-                        w={{ base: "100%", md: "346px" }}
-                        maxW='100%'
-                        h='46px'
-                        name='email'
-                        value={values.email}
-                        onChange={handleChange}
-                        placeholder='Your email adress'
-                      />
-                    </GradientBorder>
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel
-                      ms='4px'
-                      fontSize='sm'
-                      fontWeight='normal'
-                      color='white'>
-                        Password
-                    </FormLabel>
-                    <GradientBorder
-                      mb='24px'
-                      w={{ base: "100%", lg: "fit-content" }}
-                      borderRadius='20px'>
-                        <Field
-                          as={Input}
-                          color='white'
-                          bg='rgb(19,21,54)'
-                          border='transparent'
-                          borderRadius='20px'
-                          fontSize='sm'
-                          size='lg'
-                          w={{ base: "100%", md: "346px" }}
-                          maxW='100%'
-                          type='password'
-                          name='password'
-                          value={values.password}
-                          onChange={handleChange}
-                          placeholder='Your password'
-                        />
-                    </GradientBorder>
-                  </FormControl>
-                  <FormControl display='flex' alignItems='center'>
-                    <DarkMode>
-                      <Switch id='rememberMe' colorScheme='brand' me='10px' name='rememberMe' value={values.rememberMe} onChange={handleChange}/>
-                    </DarkMode>
-                    <FormLabel
-                      htmlFor='rememberMe'
-                      mb='0'
-                      ms='1'
-                      fontWeight='normal'
-                      color='white'>
-                        Remember me
-                    </FormLabel>
-                  </FormControl>
-                  <Button
-                    variant='brand'
-                    fontSize='10px'
-                    type='submit'
-                    w='100%'
-                    maxW='350px'
-                    h='45'
-                    mb='20px'
-                    mt='20px'>
-                      SIGN IN
-                  </Button>
-                </Form>
-                )}
-              </Formik>
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <CustomInput 
+                  label={'Email'} 
+                  name={'email'}
+                  control={control}
+                  type='email'
+                  placeholder='Your email address'
+                  w={{ base: "100%", md: "346px" }}
+                  h='46px'
+                />
+                <CustomInput
+                  label={'Password'}
+                  name={'password'}
+                  control={control}
+                  type='password'
+                  placeholder='Your password'
+                  w={{ base: "100%", md: "346px" }}
+                  h='46px'
+                />
+                <CustomCheckbox 
+                  display='flex'
+                  alignItems='center'
+                  name='rememberMe'
+                  label='Remember Me'
+                  control={control}
+                />
+                <Button
+                  variant='brand'
+                  fontSize='10px'
+                  type='submit'
+                  w='100%'
+                  maxW='350px'
+                  h='45'
+                  mb='20px'
+                  mt='20px'
+                  >
+                    SIGN IN
+                </Button>
+              </form>
             </Flex>
           </Flex>
           <Box

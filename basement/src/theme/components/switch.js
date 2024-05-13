@@ -10,7 +10,7 @@ export const switchStyles = {
           _active: {
             bg: "brand.700",
           },
-          _focus: "none",
+          _focus: {},
         },
       },
     },

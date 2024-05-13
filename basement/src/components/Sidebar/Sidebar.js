@@ -9,7 +9,7 @@ function Sidebar({ logoText }) {
   let location = useLocation();
   let sidebarBg = "linear-gradient(111.84deg, rgba(6, 11, 38, 0.94) 59.3%, rgba(26, 31, 55, 0) 100%)";
 
-  const isActiveRoute = (routeName) => ( location.pathname === routeName );
+  const isActiveRoute = (routeName) => ( location.pathname === routeName || `/${location.pathname.split('/')[1]}` === routeName );
 
   return (
     <Box>

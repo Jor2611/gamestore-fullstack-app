@@ -1,8 +1,17 @@
-import { ArrowForwardIcon, BellIcon } from '@chakra-ui/icons'
-import { Flex, Menu, MenuButton, MenuItem, MenuList, Tooltip } from '@chakra-ui/react'
-import { ItemContent } from '../Menu/ItemContent'
-import SidebarResponsive from '../Sidebar/SidebarResponsive'
+import { 
+  Flex, 
+  Menu, 
+  MenuButton, 
+  MenuList, 
+  MenuItem, 
+  Tooltip, 
+  Icon 
+} from '@chakra-ui/react';
+import { FaBell, FaPersonWalkingArrowRight } from 'react-icons/fa6';
+import { ItemContent } from '../Menu/ItemContent';
+import SidebarResponsive from '../Sidebar/SidebarResponsive';
 import avatar1 from "../../assets/img/avatars/avatar1.png";
+import avatar2 from "../../assets/img/avatars/avatar2.png";
 
 export const TopNavLinks = ({ signOut }) => {
   return (
@@ -16,7 +25,7 @@ export const TopNavLinks = ({ signOut }) => {
       <Menu>
         <Tooltip label='Notifications' hasArrow fontSize='smaller'>
           <MenuButton>
-            <BellIcon color='#FFF' w='25px' h='25px' me='0px'/>
+            <Icon as={FaBell} color='#FFF' w='25px' h='25px' />
           </MenuButton>
         </Tooltip>
         <MenuList
@@ -26,11 +35,12 @@ export const TopNavLinks = ({ signOut }) => {
           bg='linear-gradient(127.09deg, rgba(6, 11, 40, 0.94) 19.41%, rgba(10, 14, 35, 0.69) 76.65%)'
         >
           <Flex flexDirection='column'>
-          <MenuItem
+            <MenuItem
               borderRadius='8px'
-              _hover={{ bg: "transparent" }}
-              _active={{ bg: "transparent" }}
-              _focus={{ bg: "transparent" }}
+              bg='inherit'
+              _hover={{ bg: "brand.500" }}
+              _active={{ bg: "brand.500" }}
+              _focus={{ bg: "brand.500" }}
               mb='10px'>
               <ItemContent
                 time='13 minutes ago'
@@ -40,13 +50,28 @@ export const TopNavLinks = ({ signOut }) => {
                 aSrc={avatar1}
               />
             </MenuItem>
+            <MenuItem
+              borderRadius='8px'
+              bg='inherit'
+              _hover={{ bg: "brand.500" }}
+              _active={{ bg: "brand.500" }}
+              _focus={{ bg: "brand.500" }}
+              mb='10px'>
+              <ItemContent
+                time='13 minutes ago'
+                info='from Alicia'
+                boldInfo='New Message'
+                aName='Alicia'
+                aSrc={avatar2}
+              />
+            </MenuItem>
           </Flex>
         </MenuList>
       </Menu>
       <Menu>
         <Tooltip label={'Logout'} hasArrow fontSize='smaller'>
           <MenuButton onClick={() => { signOut() }}>
-            <ArrowForwardIcon color='#FFF' w='25px' h='25px' me='0px'/>
+            <Icon as={FaPersonWalkingArrowRight} color='#FFF' me='0px' w='25px' h='25px' />
           </MenuButton>
         </Tooltip>
       </Menu>

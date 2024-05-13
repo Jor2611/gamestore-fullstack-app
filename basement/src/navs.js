@@ -1,14 +1,6 @@
-import {
-  HomeIcon,
-  StatsIcon,
-  CreditIcon,
-  PersonIcon,
-  DocumentIcon,
-  RocketIcon,
-  SupportIcon,
-} from "./components/Icons/Icons";
+import { DocumentIcon, RocketIcon } from "./components/Icons/Icons";
 
-var routes = [
+const routes = [
   {
     to: "/games",
     label: "Games",

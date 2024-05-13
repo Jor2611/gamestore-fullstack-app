@@ -10,6 +10,9 @@ import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { RBACGuard } from './guards/rbac.guard';
 import { HttpExceptionFilter } from './exceptionFilters/response.exception';
 import { TokenParse } from './middleware/token-parse.middleware';
+import { GameModule } from './game/game.module';
+import { GenreModule } from './genre/genre.module';
+import { PlatformModule } from './platform/platform.module';
 
 @Module({
   imports: [
@@ -29,6 +32,9 @@ import { TokenParse } from './middleware/token-parse.middleware';
         signOptions: { expiresIn: config.get<string>('JWT_EXPIRATION') }
       })
     }),
+    GameModule,
+    GenreModule,
+    PlatformModule,
   ],
   controllers: [AppController],
   providers: [
