@@ -32,7 +32,8 @@ export const rolePermissionMap = {
     { resource: 'account', operation: 'update', access: AccessTypes.All },
     { resource: 'account', operation: 'delete', access: AccessTypes.All },
     { resource: 'game', operation: 'create', access: AccessTypes.All },
+    { resource: 'game', operation: 'read', access: AccessTypes.All },
+    { resource: 'game', operation: 'update', access: AccessTypes.All },
     { resource: 'game', operation: 'delete', access: AccessTypes.All }
-
   ]
 }

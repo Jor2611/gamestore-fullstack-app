@@ -1,12 +1,11 @@
 import { useContext, useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
-import { Flex, Text, Grid, GridItem, Button, useDisclosure } from '@chakra-ui/react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Flex, Text, Grid, GridItem, Button } from '@chakra-ui/react';
 import { Separator } from '../../components/Separator/Separator';
 import Card from '../../components/Card/Card';
 import CardHeader from '../../components/Card/CardHeader';
 import CardBody from '../../components/Card/CardBody';
-import FetchGame from '../../components/Modals/FetchGame';
 import CustomInput from '../../components/Input/CustomInput';
 import Preview from '../../components/Preview/Preview';
 import PreviewPlaceholder from '../../components/Preview/PreviewPlaceholder';
@@ -14,8 +13,7 @@ import CustomSelect from '../../components/Input/CustomSelect';
 import CustomTextArea from '../../components/Input/CustomTextArea';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 import { LayoutContext } from '../../store/LayoutContext';
-import { createGame } from '../../utils/http';
-
+import { fetchGame, updateGame } from '../../utils/http';
 
 let initialValues = {
   name: '',
@@ -32,69 +30,58 @@ let initialValues = {
   short_screenshots: []
 };
 
-const AddGame = () => {
+
+const EditGame = () => {
+  const { gameId } = useParams();
   const [fetchedGame, setFetchedGame] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
   const navigate = useNavigate();
+
+  const { genres, platforms } = useContext(LayoutContext);
+
+  useEffect(() => {
+    async function fetchGameData(){
+      try{
+        const response = await fetchGame(gameId);
+        const { gallery, ...gameData } = response.data;
+        const adaptedGameData = { ...gameData, short_screenshots: gallery.map((item,i) => ({ id: i, image: item })) };
+        setFetchedGame(prevState => ({ ...prevState, ...adaptedGameData }));
+        reset(adaptedGameData);
+      }catch(err){
+        console.log(err);
+      }
+    }
+
+    fetchGameData();
+  },[gameId,navigate]);
+
+
   const { 
-    genres, 
-    genresMap, 
-    platforms, 
-    platformsMap
-  } = useContext(LayoutContext);
-  const { 
-    control, 
-    watch, 
-    handleSubmit, 
-    setValue, 
-    reset, 
-    getValues, 
+    reset,
+    watch,
+    control,
+    getValues,
+    handleSubmit,
     formState: { 
-      isDirty, 
-      defaultValues, 
+      isDirty,
       isSubmitting
     } 
   } = useForm({ defaultValues: initialValues });
 
+
+  const watchForAllFields = watch();
+
+  useEffect(() => {
+    const values = getValues();
+    setShowPreview(JSON.stringify(initialValues)!==JSON.stringify(values))
+  },[watchForAllFields]);
+
+  
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'short_screenshots'
   });
-
-  const watchForAllFields = watch();
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
-  useEffect(() => {
-    if(fetchedGame){
-      const values = getValues();
-      Object.keys(fetchedGame).forEach((key,i) => {
-        if(values.hasOwnProperty(key)){
-          //Refactor
-          if(key === 'genres' || key === 'platforms'){
-            const map = key === 'genres' ? genresMap : platformsMap;
-            const result = fetchedGame[key].reduce((acc,curr) => {
-              const item = map.get(key === 'genres' ? curr.slug : curr.platform.slug);
-              if(item){
-                acc.push(item);
-              }
-              return acc;
-            },[]);
-            setValue(key,result);
-          } else {            
-            setValue(key,fetchedGame[key] || defaultValues[key]);
-          } 
-        }
-      });
-    }
-  },[fetchedGame]);
-
-  useEffect(() => {
-    const values = getValues();
-    setShowPreview(JSON.stringify(defaultValues)!==JSON.stringify(values))
-  },[watchForAllFields]);
-
 
   const validate = {
     name: { required: true },
@@ -156,7 +143,7 @@ const AddGame = () => {
     try{
       setIsLoading(true);
       const adaptedData = await adaptData(data);
-      const response = await createGame(adaptedData);
+      const response = await updateGame(gameId, adaptedData);
       navigate('/game', { replace: true });      
     }catch(err){
       console.log(err);
@@ -177,17 +164,8 @@ const AddGame = () => {
               w='100%'
             >
               <Text fontSize='lg' color='#fff' fontWeight='bold'>
-                Add A New Game
+                Edit Game
               </Text>
-              <Button
-                variant='brand'
-                fontSize='10px'
-                fontWeight='bold'
-                p='6px 32px'
-                onClick={onOpen}
-              >
-                Fetch Data
-              </Button>
             </Flex>
           </CardHeader>
           <Separator/>
@@ -432,7 +410,7 @@ const AddGame = () => {
                     h='46px'
                     mx='10px'
                     my='20px'
-                    onClick={() => reset()}
+                    onClick={() => reset({...fetchedGame})}
                   >
                     Reset
                   </Button>
@@ -449,7 +427,7 @@ const AddGame = () => {
                     isLoading={isSubmitting}
                     isDisabled={!isDirty || isSubmitting}
                   >
-                    Create
+                    Update
                   </Button>
                 </GridItem>
               </Grid>
@@ -457,11 +435,6 @@ const AddGame = () => {
           </CardBody>
         </Card>
       </Grid>
-      <FetchGame 
-        onClose={onClose} 
-        isOpen={isOpen} 
-        setFetched={setFetchedGame}
-      />
     </Flex>
   )
 }
@@ -469,4 +442,4 @@ const AddGame = () => {
 
 
 
-export default AddGame;
+export default EditGame;

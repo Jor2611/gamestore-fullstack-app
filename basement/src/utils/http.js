@@ -49,6 +49,16 @@ export async function checkToken(token){
   }
 }
 
+export async function fetchGame(id){
+  try{
+    const response = await backendAPI.get(`/game/${id}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}` } });
+    return response.data;
+  }catch(err){
+    console.log(err);
+    throw err;
+  }  
+}
+
 export async function fetchGames(){
   try{
     const response = await backendAPI.get(`/game`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}` } });
@@ -59,9 +69,29 @@ export async function fetchGames(){
   }  
 }
 
+export async function fetchGameRows(page, size){
+  try{
+    const response = await backendAPI.get(`/game?page=${page}&size=${size}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}` } });
+    return response.data;
+  }catch(err){
+    console.log(err);
+    throw err;
+  }  
+}
+
 export async function createGame(data){
   try{
     const response = await backendAPI.post(`/game`, { ...data }, { headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}` } });
+    return response.data;
+  }catch(err){
+    console.log(err);
+    throw err;
+  }
+}
+
+export async function updateGame(id,data){
+  try{
+    const response = await backendAPI.patch(`/game/${id}`, { ...data }, { headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}` } });
     return response.data;
   }catch(err){
     console.log(err);

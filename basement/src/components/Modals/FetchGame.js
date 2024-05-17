@@ -24,6 +24,7 @@ const FetchGame = ({ isOpen, onClose, setFetched }) => {
 
   const [fetchedGames, setFetchedGames] = useState([]);
   const [selectedGame, setSelectedGame] = useState(null);
+  const [isDataLoading, setIsDataLoading] = useState(false);
 
   const toast = useToast();
   const { 
@@ -38,6 +39,7 @@ const FetchGame = ({ isOpen, onClose, setFetched }) => {
   
   const onSubmit = async (data) => {
     try {
+      setIsDataLoading(true);
       const result = await findMatchedGames(data.query);
       setFetchedGames(result.slice(0,7));
     } catch (error) {
@@ -50,6 +52,8 @@ const FetchGame = ({ isOpen, onClose, setFetched }) => {
           </Box>
         )
       })
+    } finally {
+      setIsDataLoading(false);
     }
   };
 
@@ -91,12 +95,10 @@ const FetchGame = ({ isOpen, onClose, setFetched }) => {
               <form onSubmit={handleSubmit(onSubmit)}>
                 <CustomInput
                   label={'Game Name'}
-                  type='text'
-                  placeholder='Type games name to search...'
                   name={'query'}
+                  type='text'
                   control={control}
-                  w='100%'
-                  h='46px'
+                  placeholder='Type games name to search...'
                 />
                 <Button
                   variant='secondary'
@@ -115,6 +117,7 @@ const FetchGame = ({ isOpen, onClose, setFetched }) => {
               </form>
               <Box w="100%">
                 <FetchedGamesList 
+                  isLoading={isDataLoading}
                   games={fetchedGames} 
                   onSelect={setSelectedGame}
                 />

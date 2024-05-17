@@ -18,11 +18,10 @@ import { useForm } from 'react-hook-form';
 
 
 const LoginForm = () => {
-  const initialValues = { email: '', password: '', rememberMe: false };
   const adminCtx = useContext(AdminContext);
 
   const { control, handleSubmit } = useForm({
-    defaultValues: initialValues
+    defaultValues: { email: '', password: '', rememberMe: false }
   });
 
   const onSubmit = async (values) => {
@@ -38,14 +37,15 @@ const LoginForm = () => {
     <ChakraProvider theme={theme} w='100%'>
       <Flex position='relative'>
         <Flex
-          minH='100vh'
-          h={{ base: "120vh", lg: "fit-content" }}
+          flexDirection='column'
           w='100%'
           maxW='1044px'
+          minH='100vh'
+          h={{ base: "120vh", lg: "fit-content" }}
           mx='auto'
+          me={{ base: "auto", lg: "50px", xl: "auto" }}
           pt={{ sm: "100px", md: "0px" }}
-          flexDirection='column'
-          me={{ base: "auto", lg: "50px", xl: "auto" }}>
+        >
           <Flex
             alignItems='center'
             justifyContent='start'
@@ -58,15 +58,27 @@ const LoginForm = () => {
               direction='column'
               w='100%'
               background='transparent'
-              mt={{ base: "50px", md: "150px", lg: "160px", xl: "245px" }}
-              mb={{ base: "60px", lg: "95px" }}>
-              <Heading color={"white"} fontSize='32px' mb='10px'>
+              mt={{ 
+                base: "50px", 
+                md: "150px", 
+                lg: "160px", 
+                xl: "245px" 
+              }}
+              mb={{ base: "60px", lg: "95px" }}
+            >
+              <Heading 
+                color={"white"} 
+                textAlign='center' 
+                fontSize='32px' 
+                mb='10px'
+              >
                 Nice to see you!
               </Heading>
               <Text
                 mb='36px'
                 ms='4px'
                 color={"gray.400"}
+                textAlign='center'
                 fontWeight='bold'
                 fontSize='14px'>
                   Enter your email and password to sign in
@@ -77,19 +89,19 @@ const LoginForm = () => {
                   name={'email'}
                   control={control}
                   type='email'
+                  width={{ base: "100%", md: "346px" }}
                   placeholder='Your email address'
-                  w={{ base: "100%", md: "346px" }}
-                  h='46px'
                 />
+
                 <CustomInput
                   label={'Password'}
                   name={'password'}
                   control={control}
                   type='password'
+                  width={{ base: "100%", md: "346px" }}
                   placeholder='Your password'
-                  w={{ base: "100%", md: "346px" }}
-                  h='46px'
                 />
+
                 <CustomCheckbox 
                   display='flex'
                   alignItems='center'
@@ -97,17 +109,17 @@ const LoginForm = () => {
                   label='Remember Me'
                   control={control}
                 />
+
                 <Button
                   variant='brand'
-                  fontSize='10px'
-                  type='submit'
                   w='100%'
                   maxW='350px'
                   h='45'
-                  mb='20px'
-                  mt='20px'
-                  >
-                    SIGN IN
+                  my='20px'
+                  fontSize='10px'
+                  type='submit'
+                >
+                  SIGN IN
                 </Button>
               </form>
             </Flex>
@@ -115,12 +127,13 @@ const LoginForm = () => {
           <Box
             display={{ base: "none", lg: "block" }}
             overflowX='hidden'
-            h='100%'
+            w='960px'
             maxW={{ md: "50vw", lg: "50vw" }}
             minH='100vh'
-            w='960px'
+            h='100%'            
             position='absolute'
-            left='0px'>
+            left='0px'
+          >
             <Box
               bgImage={signInImage}
               w='100%'
@@ -131,7 +144,8 @@ const LoginForm = () => {
               display='flex'
               flexDirection='column'
               justifyContent='center'
-              alignItems='center'>
+              alignItems='center'
+            >
               <Text
                 textAlign='center'
                 color='white'
@@ -147,7 +161,8 @@ const LoginForm = () => {
                 fontSize='36px'
                 fontWeight='bold'
                 bgClip='text !important'
-                bg='linear-gradient(94.56deg, #FFFFFF 79.99%, #21242F 102.65%)'>
+                bg='linear-gradient(94.56deg, #FFFFFF 79.99%, #21242F 102.65%)'
+              >
                 PLAYON BASEMENT
               </Text>
             </Box>

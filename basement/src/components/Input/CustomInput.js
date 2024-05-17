@@ -18,7 +18,8 @@ const CustomInput = (props) => {
     type, 
     label, 
     placeholder,
-    control, 
+    control,
+    width,
     height,
     remove,
     validate
@@ -60,9 +61,8 @@ const CustomInput = (props) => {
           border="transport"
           fontSize="sm"
           size="lg"
-          maxW="100%"
-          w="100%"
-          h={height}
+          w={width || "100%"}
+          h={height || '46px'}
           onChange={field.onChange}
           onBlur={field.onBlur}
           name={field.name}

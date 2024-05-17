@@ -8,6 +8,7 @@ import {
   Table,
 	Thead,
   Tbody,
+  Tfoot,
   Text,
   Th,
   Tr,
@@ -16,33 +17,38 @@ import {
 import Card from "../../components/Card/Card.js";
 import CardHeader from "../../components/Card/CardHeader.js";
 import CardBody from "../../components/Card/CardBody.js";
-import GamesTableRow from "../../components/Tables/GamesTablesRow";
-import { GamesContext } from "../../store/GamesContext.js";
-import { deleteGame, fetchGames } from "../../utils/http.js";
 import DeleteDialog from "../../components/Dialogs/DeleteDialog.js";
+import GamesTableRow from "../../components/Tables/GamesTablesRow";
+import TablePagination from "../../components/Pagination/TablePagination.js";
+import { GamesContext } from "../../store/GamesContext.js";
+import { deleteGame, fetchGameRows } from "../../utils/http.js";
 
 function Games() {
+  const pageSize=4;
 	const navigate = useNavigate();
+  const [rowsCount, setRowsCount]=useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isDataLoading, setIsDataLoading] = useState(false);  
   const [selectedForDeletion, setSelectedForDeletion] = useState(null);
   const { games, loadGamesData, deleteGameData } = useContext(GamesContext);
-  const { 
-    isOpen: isDeleteDialogOpen, 
-    onOpen: openDeleteDialog, 
-    onClose: closeDeleteDialog 
-  } = useDisclosure();
+  const { isOpen: isDeleteDialogOpen, onOpen: openDeleteDialog, onClose: closeDeleteDialog } = useDisclosure();
 
   useEffect(() => {
-    async function fetchGamesData(){
+    async function loadData(){
       try{
-        const fetchedGames = await fetchGames();
-        loadGamesData(fetchedGames.data);
+        setIsDataLoading(true);
+        const response = await fetchGameRows(currentPage, pageSize);
+        loadGamesData(response.data.games);
+        setRowsCount(response.data.count);
       }catch(err){
-        console.log(err)
+        console.log(err);
+      }finally{
+        setIsDataLoading(false);
       }
     }
+    loadData();
+  },[currentPage]);
 
-    fetchGamesData();
-  },[]);
 
   const deleteGameHandler = async(id) => {
     try{
@@ -75,7 +81,7 @@ function Games() {
 				mb='24px'>
 				{/* <GenresCard/> */}
 			</Grid>
-      <Card overflowX={{ sm: "scroll", xl: "hidden" }} pb='200px'>
+      <Card overflowX={{ sm: "scroll", xl: "hidden" }} minH='320px'>
         <CardHeader p='6px 0px 22px 0px'>
           <Flex
             justify='space-between'
@@ -91,7 +97,7 @@ function Games() {
               fontWeight='bold'
               p='6px 32px'
 							onClick={() => navigate('/games/new')}
-							>
+						>
               Add New
             </Button>
           </Flex>
@@ -152,25 +158,41 @@ function Games() {
               </Tr>
             </Thead>
             <Tbody>
-              {games.map((row, index, arr) => {
-                return (
-                  <GamesTableRow
-                    key={index}
-                    name={row.name}
-                    logo={row.background_image}
-                    publisher={row.publisher}
-                    platforms={row.platforms}
-                    genres={row.genres}
-                    rating={row.rating}
-                    metacritic={row.metacritic}
-                    released={row.released}
-                    updatedAt={row.updatedAt}
-                    lastItem={index === arr.length - 1 ? true : false}
-                    deleteDialogHandler={()=>deleteDialogHandler(row)}
-                  />
-                );
-              })}
+              {games.map((row, index, arr) =>  (
+                <GamesTableRow
+                  key={index}
+                  isLoading={isDataLoading}
+                  gameData={{
+                    id: row.id,
+                    name:row.name,
+                    logo:row.background_image,
+                    publisher:row.publisher,
+                    platforms:row.platforms,
+                    genres:row.genres,
+                    rating:row.rating,
+                    metacritic:row.metacritic,
+                    released:row.released,
+                    updatedAt:row.updatedAt,
+                  }}
+                  lastItem={index === arr.length - 1}
+                  deleteDialogHandler={()=>deleteDialogHandler(row)}
+                />
+              ))}
             </Tbody>
+            <Tfoot>
+              <Tr>
+                <Th colSpan={8}>
+                  <Flex justifyContent='flex-end' mr='45px'>
+                    <TablePagination 
+                      pageSize={pageSize}
+                      rowsCount={rowsCount}
+                      currentPage={currentPage}
+                      setCurrentPage={setCurrentPage}
+                    />
+                  </Flex>
+                </Th>
+              </Tr> 
+            </Tfoot>
           </Table>
         </CardBody>
       </Card>

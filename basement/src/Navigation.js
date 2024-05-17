@@ -10,6 +10,7 @@ import LoginForm from './views/LoginForm';
 import Games from './views/Games/Games';
 import Orders from './views/Orders/Orders';
 import AddGame from './views/Games/AddGame';
+import EditGame from './views/Games/EditGame';
 
 
 export default function AppNavigation() {
@@ -51,6 +52,7 @@ export default function AppNavigation() {
     return () => {
       eventEmitter.removeListener('unauthorized', handleUnauthorized);
     };
+    
   },[]);
 
   if(isAdminLoading){
@@ -63,6 +65,7 @@ export default function AppNavigation() {
         {isAdminAuth && <Route index element={<Navigate to='/games' replace/>}/>}
         {isAdminAuth && <Route path='games' element={<Games/>}/>}
         {isAdminAuth && <Route path='games/new' element={<AddGame/>}/>}
+        {isAdminAuth && <Route path='games/:gameId/edit' element={<EditGame/>}/>}
         {isAdminAuth && <Route path='orders' element={<Orders/>}/>}
         <Route path='*' element={<Navigate to='/games' replace/>}/>
       </Route>

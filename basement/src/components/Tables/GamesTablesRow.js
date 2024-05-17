@@ -10,51 +10,74 @@ import {
   Td,
   Text,
   Tr,
-} from "@chakra-ui/react";
-import { FaEllipsisVertical, FaPencil, FaTrashCan, FaPhotoFilm } from "react-icons/fa6";
-import { adaptToUpdateDate } from "../../utils/dateManager";
+} from '@chakra-ui/react';
+import { FaEllipsisVertical, FaPencil, FaTrashCan, FaPhotoFilm } from 'react-icons/fa6';
+import { useNavigate } from 'react-router-dom';
+import { adaptToUpdateDate } from '../../utils/dateManager';
+import GamesTableRowSkeleton from '../Skeletons/GamesTableRowSkeleton';
 
 
 function GamesTableRow(props) {
   const {
-    logo,
-    name,
-    publisher,
-    platforms,
-    genres,
-    rating,
-    metacritic,
-    released,
-    updatedAt,
+    gameData: {
+      id,
+      logo,
+      name,
+      publisher,
+      platforms,
+      genres,
+      rating,
+      metacritic,
+      released,
+      updatedAt,
+    },
+    isLoading,
     lastItem,
     deleteDialogHandler
   } = props;
 
+  // if(isLoading){
+  //   return <GamesTableRowSkeleton lastItem={lastItem}/>
+  // }
+
+  const navigate = useNavigate();
+
   return (
     <Tr>
       <Td
-        minWidth={{ sm: "220px" }}
         ps='0px'
-        border={lastItem ? "none" : null}
+        w='330px'
+        minW='330px'
+        border={lastItem && 'none'}
         borderBottomColor='#56577A'>
-        <Flex align='center' py='.8rem' minWidth='100%' flexWrap='nowrap'>
+        <Flex 
+          py='.8rem'
+          minW='100%'
+          align='center' 
+          flexWrap='nowrap'>          
           <Avatar
             src={logo}
             w='60px'
             h='60px'
-            borderRadius='12px'
             me='18px'
+            bg='none'
             border='none'
+            borderRadius='12px'
+            icon={<Icon color='transparent'/>}
           />
+
           <Flex direction='column'>
             <Text
-              fontSize='sm'
               color='#fff'
-              fontWeight='normal'
-              minWidth='100%'>
+              minWidth='100%'
+              fontSize='sm'
+              fontWeight='normal'>
               {name}
             </Text>
-            <Text fontSize='sm' color='gray.400' fontWeight='normal'>
+            <Text 
+              color='gray.400' 
+              fontSize='sm' 
+              fontWeight='normal'>
               {publisher}
             </Text>
           </Flex>
@@ -62,127 +85,177 @@ function GamesTableRow(props) {
       </Td>
 
       <Td
-        border={lastItem ? "none" : null}
-        borderBottomColor='#56577A'
-        minW='120px'>
-        <Flex direction='column' flexWrap='nowrap' alignContent={'center'}>
+        w='180px'
+        minW='180px'
+        border={lastItem && 'none'}
+        borderBottomColor='#56577A'>
+        <Flex direction='column'>
           {[0,1,2].map((_,i) => 
             { return platforms[i] ? (
-              <Text key={i} fontSize='sm' color={i === 0 ? '#FFF' : 'gray.400'} fontWeight='normal'>
+              <Text 
+                key={i} 
+                fontSize='sm' 
+                fontWeight='normal'
+                color={i === 0 ? '#FFF' : 'gray.400'}> 
                 {platforms[i].label} {i===2 && '...'}
-              </Text>) : null
+              </Text>
+              ) : null
             }
           )}
         </Flex>
       </Td>
 
       <Td
-        border={lastItem ? "none" : null}
-        borderBottomColor='#56577A'
-        minW='120px'>
+        w='160px'
+        minW='160px'
+        border={lastItem && 'none'}
+        borderBottomColor='#56577A'>
         <Flex direction='column'>
-        {[0,1,2].map((_,i) => 
-            { return genres[i] ? (
-              <Text key={i} fontSize='sm' color={i === 0 ? '#FFF' : 'gray.400'} fontWeight='normal'>
-                {genres[i].label}
-              </Text>) : null
-            }
-          )}
+          {[0,1,2].map((_,i) => 
+              { return genres[i] ? (
+                <Text 
+                  key={i} 
+                  fontSize='sm' 
+                  fontWeight='normal'
+                  color={i === 0 ? '#FFF' : 'gray.400'}>
+                  {genres[i].label} {i===2 && '...'}
+                </Text>
+                ) : null
+              }
+            )}
         </Flex>
       </Td>
 
-      <Td border={lastItem ? "none" : null} borderBottomColor='#56577A'>
-        <Badge
-          bg="transparent"
-          color= "white"
-          fontSize='sm'
-          p='3px 10px'
-          borderRadius='8px'
-          border="1px solid #fff"
-          fontWeight='normal'>
-          {rating}
-        </Badge>
+      <Td 
+        w='100px'
+        minW='100px'
+        border={lastItem && 'none'}
+        borderBottomColor='#56577A'>
+        <Flex justifyContent='center'>
+          <Badge
+            p='3px 10px'
+            color= '#FFF'
+            fontSize='sm'
+            fontWeight='normal'
+            bg='transparent'
+            border='1px solid #fff'
+            borderRadius='8px'>
+            {rating}
+          </Badge>
+        </Flex>
       </Td>
 
-      <Td border={lastItem ? "none" : null} borderBottomColor='#56577A'>
-        <Badge
-          bg="transparent"
-          color= "white"
-          fontSize='sm'
-          p='3px 10px'
-          borderRadius='8px'
-          border="1px solid #fff"
-          fontWeight='normal'>
-          {metacritic}
-        </Badge>
+      <Td         
+        w='130px'
+        minW='130px'
+        border={lastItem && 'none'}
+        borderBottomColor='#56577A'>
+        <Flex justifyContent='center'>
+          <Badge
+            p='3px 10px'
+            color= '#FFF'
+            fontSize='sm'
+            fontWeight='normal'
+            bg='transparent'
+            border='1px solid #fff'
+            borderRadius='8px'>
+            {metacritic}
+          </Badge>
+        </Flex>
       </Td>
 
-      <Td border={lastItem ? "none" : null} borderBottomColor='#56577A'>
-        <Text fontSize='sm' color='#fff' fontWeight='normal'>
+      <Td 
+        w='170px'
+        minW='170px'
+        border={lastItem && 'none'}
+        borderBottomColor='#56577A'>
+        <Text
+          color='#fff'
+          fontSize='sm'
+          fontWeight='normal'>
           {released}
         </Text>
       </Td>
 
-      <Td border={lastItem ? "none" : null} borderBottomColor='#56577A'>
-        <Text fontSize='sm' color='#fff' fontWeight='normal'>
+      <Td
+        w='250px'
+        minW='250px'
+        border={lastItem && 'none'}
+        borderBottomColor='#56577A'>
+        <Text
+          color='#fff'
+          fontSize='sm'
+          fontWeight='normal'>
           {adaptToUpdateDate(updatedAt)}
         </Text>
       </Td>
 
-      <Td border={lastItem ? "none" : null} borderBottomColor='#56577A'>
+      <Td 
+        w='150px'
+        minW='150px'
+        border={lastItem && 'none'}
+        borderBottomColor='#56577A'>
         <Menu>
-          <MenuButton>
-            <Icon as={FaEllipsisVertical} color='gray.400' cursor='pointer' />   
+          <MenuButton ml='25px'>
+            <Icon 
+              color='gray.400' 
+              cursor='pointer'
+              as={FaEllipsisVertical} 
+            />   
           </MenuButton>
           <MenuList
-            border='transparent'
-            backdropFilter='blur(63px)'
-            borderRadius='20px'
             bg='linear-gradient(127.09deg, rgba(6, 11, 40, 0.94) 19.41%, rgba(10, 14, 35, 0.69) 76.65%)'
-          >
+            border='transparent'
+            borderRadius='20px'
+            backdropFilter='blur(63px)'>
+
             <Flex flexDirection='column'>
               <MenuItem
-                  borderRadius='8px'
-                  bg='inherit'
-                  _hover={{ bg: "brand.400" }}
-                  _active={{ bg: "brand.400" }}
-                  _focus={{ bg: "brand.400" }}
-                > 
-                <Flex color='green.500' cursor='pointer' align='center' p='12px'>
+                bg='inherit'
+                borderRadius='8px'
+                _hover={{ bg: 'brand.400' }}
+                _focus={{ bg: 'brand.400' }}
+                _active={{ bg: 'brand.400' }}> 
+
+                <Flex p='12px' align='center' color='green.500' cursor='pointer'>
                   <Icon as={FaPhotoFilm} me='4px' w='14px' h='14px' />
                   <Text fontSize='xs'>
                     Preview
                   </Text>
                 </Flex>   
+
               </MenuItem>
               <MenuItem
-                borderRadius='8px'
                 bg='inherit'
-                _hover={{ bg: "brand.400" }}
-                _active={{ bg: "brand.400" }}
-                _focus={{ bg: "brand.400" }}
-              >
-                <Flex cursor='pointer' align='center' p='12px'>
-                  <Icon as={FaPencil} me='4px' w='14px' h='14px' />
+                borderRadius='8px'
+                _hover={{ bg: 'brand.400' }}
+                _focus={{ bg: 'brand.400' }}
+                _active={{ bg: 'brand.400' }}
+                onClick={() => navigate(`${id}/edit`)}>
+
+                <Flex p='12px' align='center' cursor='pointer'>
+                  <Icon as={FaPencil} w='14px' h='14px' me='4px'/>
                   <Text fontSize='xs' color='gray.400'>
                     Edit
                   </Text>
                 </Flex>
+
               </MenuItem>
               <MenuItem
-                borderRadius='8px'
                 bg='inherit'
-                _hover={{ bg: "brand.400" }}
-                _active={{ bg: "brand.400" }}
-                _focus={{ bg: "brand.400" }}
-                onClick={deleteDialogHandler}
-              >
-                <Flex color='red.500' cursor='pointer' align='center' p='12px'>
-                  <Icon as={FaTrashCan} me='4px' w='14px' h='14px' />
+                borderRadius='8px'
+                _hover={{ bg: 'brand.400' }}
+                _focus={{ bg: 'brand.400' }}
+                _active={{ bg: 'brand.400' }}
+                onClick={deleteDialogHandler}>
+
+                <Flex p='12px' align='center' color='red.500' cursor='pointer'>
+                  <Icon as={FaTrashCan} w='14px' h='14px' me='4px'/>
                   <Text fontSize='xs'>
                     Delete
                   </Text>
                 </Flex> 
+              
               </MenuItem>
             </Flex>
           </MenuList>

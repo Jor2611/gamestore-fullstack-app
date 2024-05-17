@@ -13,13 +13,16 @@ const NavBreadCrumbs = ({ path }) => {
         <BreadcrumbLink color='#A0AEC0'>
         </BreadcrumbLink>
       </BreadcrumbItem>
-      {paths.map((item,i) => (
-        <BreadcrumbItem key={i} color={'#FFF'}>
-          <BreadcrumbLink textTransform={'capitalize'} onClick={() => navigate((i+1)-paths.length)} color={'#FFF'}>
-            {item}
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-      ))}
+      {paths.map((item,i) => {
+        const linkPath = paths.slice(0,i+1).join('/');
+        return (
+          <BreadcrumbItem key={i} color={'#FFF'}>
+            <BreadcrumbLink textTransform={'capitalize'} onClick={() => navigate(`/${linkPath}`,{ replace: true })} color={'#FFF'}>
+              {item}
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+        )
+      })}
     </Breadcrumb>
   )
 }

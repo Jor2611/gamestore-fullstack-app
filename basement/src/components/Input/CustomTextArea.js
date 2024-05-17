@@ -1,8 +1,7 @@
-import { Controller } from "react-hook-form";
+import { useController } from "react-hook-form";
 import { FormControl, FormLabel, Textarea } from "@chakra-ui/react";
 import GradientBorder from "../GradientBorder/GradientBorder";
 import ErrorMessage from "./ErrorMessage";
-
 
 const CustomTextArea = (props) => {
   const { 
@@ -13,12 +12,17 @@ const CustomTextArea = (props) => {
     rows, 
     width,
     resizable,
-    error,
     validate
   } = props;
 
+  const { field, fieldState: { error } } = useController({
+    name,
+    control,
+    rules: validate || null
+  });
+
   return (
-    <FormControl mb='24px'>
+    <FormControl mb='20px'>
       <FormLabel
         ms='4px'
         fontSize='sm'
@@ -29,26 +33,23 @@ const CustomTextArea = (props) => {
       <GradientBorder
         w={width}
         borderRadius='20px'>
-          <Controller
-            control={control}
-            name={name}
-            rules={validate || null}
-            render={({ field }) => (
-              <Textarea
-                {...field} 
-                color='white'
-                bg='rgb(19,21,54)'
-                border='transparent'
-                borderRadius='20px'
-                fontSize='sm'
-                size='lg'
-                w='100%'
-                maxW='100%'
-                rows={rows}
-                resize={resizable}
-                placeholder={placeholder}
-              />
-            )}
+          <Textarea
+            {...field} 
+            color="#FFF"
+            bg="rgb(19,21,54)"
+            borderRadius="20px"
+            border="transparent"
+            fontSize="sm"
+            size="lg"
+            w={width || "100%"}
+            rows={rows || 6}
+            onChange={field.onChange}
+            onBlur={field.onBlur}
+            name={field.name}
+            value={field.value}
+            ref={field.ref}
+            resize={resizable}
+            placeholder={placeholder}
           />
       </GradientBorder>
       <ErrorMessage error={error}/>

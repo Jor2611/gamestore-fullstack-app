@@ -1,4 +1,4 @@
-import { Controller } from 'react-hook-form';
+import { useController } from 'react-hook-form';
 import { FormControl, FormLabel } from '@chakra-ui/react';
 import { Select } from 'chakra-react-select';
 import GradientBorder from '../GradientBorder/GradientBorder';
@@ -7,14 +7,13 @@ import ErrorMessage from './ErrorMessage';
 const CustomSelect = (props) => {
 
   const { 
+    name,
     label, 
-    name, 
+    placeholder,
     control, 
-    options, 
-    placeholder, 
-    w, 
-    validate, 
-    error 
+    options,
+    width, 
+    validate
   } = props;
 
   const style = {
@@ -24,28 +23,28 @@ const CustomSelect = (props) => {
     }),
     control:(provided) => ({
       ...provided,
-      color:'white',
-      borderRadius:'20px',
-      bg:'rgb(19,21,54)',
+      color:'#FFF',
+      textAlign: 'start',
       fontSize:'sm',
-      _hover: {},
-      _focus: { bg:'rgb(19,21,54)' },
       minHeight: '46px',
       h: 'auto',
-      textAlign: 'start'
+      bg:'rgb(19,21,54)',
+      borderRadius:'20px',
+      _hover: {},
+      _focus: { bg:'rgb(19,21,54)' }
     }),
     multiValue:(provided) => ({
       ...provided,
       color:'white',
       fontSize:'sm',
       size:'md',
+      bg:'linear-gradient(127.09deg, rgba(6, 11, 40, 0.94) 19.41%, rgba(10, 14, 35, 0.69) 76.65%)',
       border:'1px',
-      borderColor: 'grey',
-      bg:'linear-gradient(127.09deg, rgba(6, 11, 40, 0.94) 19.41%, rgba(10, 14, 35, 0.69) 76.65%)'
+      borderColor: 'grey'
     }),
     menuList:(provided)=>({
       ...provided,
-      color:'white',
+      color:'#FFF',
       bg:'rgb(19,21,54)',
       borderRadius:'20px',
       border:'transparent'
@@ -60,10 +59,16 @@ const CustomSelect = (props) => {
       bg:'rgb(19,21,54)',
       cursor: 'pointer'
     }),
-  }
+  };
+
+  const { field, fieldState: { error } } = useController({
+    name,
+    control,
+    rules: validate || null
+  });
 
   return (
-    <FormControl w={w} mb={10}>
+    <FormControl mb={10}>
       <FormLabel
         ms='4px'
         fontSize='sm'
@@ -72,24 +77,20 @@ const CustomSelect = (props) => {
           {label}
       </FormLabel>
       <GradientBorder
-        w={w}
-        borderRadius='20px'
-      >
-        <Controller
-          control={control}
-          name={name}
-          rules={validate || null}
-          render={({ field }) => (
-            <Select
-              {...field}
-              isSearchable
-              isMulti
-              options={options}
-              placeholder={placeholder}
-              chakraStyles={style}
-              variant="filled"
-            />
-          )}
+        borderRadius='20px'>
+        <Select
+          {...field}
+          isSearchable
+          isMulti
+          variant="filled"
+          chakraStyles={style}
+          onChange={field.onChange}
+          onBlur={field.onBlur}
+          name={field.name}
+          value={field.value}
+          ref={field.ref}
+          options={options}
+          placeholder={placeholder}
         />
       </GradientBorder>
       <ErrorMessage error={error}/>
