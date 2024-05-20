@@ -1,24 +1,42 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import {
   Box,
   Flex,
   Button,
   Heading,
   Text,
-  ChakraProvider
+  ChakraProvider,
+  useToast
 } from "@chakra-ui/react";
 import theme from "../theme/themeAuth.js";
 import signInImage from "../assets/img/signInImage.png";
 import { AdminContext } from '../store/AdminContext';
-import { adminSignIn } from '../utils/http';
+import { adminSignIn } from '../utils/requestManager';
 import CustomInput from '../components/Input/CustomInput.js';
 import CustomCheckbox from '../components/Input/CustomCheckbox.js';
 import { useForm } from 'react-hook-form';
+import { AlertContext } from '../store/AlertContext.js';
 
 
 
 const LoginForm = () => {
   const adminCtx = useContext(AdminContext);
+  const { showAlert, alert } = useContext(AlertContext);
+  const toast = useToast();
+
+  useEffect(() => {
+    if(alert.message){
+      toast({
+        position:'top-right',
+        duration: 3000,
+        render:() => (
+          <Box color='white' mt={10} mr={10} p={3} bg={alert.color}>
+            {alert.message}
+          </Box>
+        )
+      })
+    }
+  }, [alert]);
 
   const { control, handleSubmit } = useForm({
     defaultValues: { email: '', password: '', rememberMe: false }
@@ -27,7 +45,10 @@ const LoginForm = () => {
   const onSubmit = async (values) => {
     try {
       const result = await adminSignIn(values);
-      adminCtx.authenticateAdmin({ id: result.data.id, token: result.data.token });
+      if(result.success){
+        adminCtx.authenticateAdmin({ id: result.data.id, token: result.data.token });
+        showAlert(result.msg);
+      }
     } catch (error) {
       console.error('Submission failed', error);
     }

@@ -47,7 +47,7 @@ function GamesTableRow(props) {
       <Td
         ps='0px'
         w='330px'
-        minW='330px'
+        minW='200px'
         border={lastItem && 'none'}
         borderBottomColor='#56577A'>
         <Flex 
@@ -86,7 +86,7 @@ function GamesTableRow(props) {
 
       <Td
         w='180px'
-        minW='180px'
+        minW='150px'
         border={lastItem && 'none'}
         borderBottomColor='#56577A'>
         <Flex direction='column'>
@@ -107,7 +107,7 @@ function GamesTableRow(props) {
 
       <Td
         w='160px'
-        minW='160px'
+        minW='90px'
         border={lastItem && 'none'}
         borderBottomColor='#56577A'>
         <Flex direction='column'>
@@ -128,7 +128,7 @@ function GamesTableRow(props) {
 
       <Td 
         w='100px'
-        minW='100px'
+        minW='80px'
         border={lastItem && 'none'}
         borderBottomColor='#56577A'>
         <Flex justifyContent='center'>
@@ -147,7 +147,7 @@ function GamesTableRow(props) {
 
       <Td         
         w='130px'
-        minW='130px'
+        minW='80px'
         border={lastItem && 'none'}
         borderBottomColor='#56577A'>
         <Flex justifyContent='center'>
@@ -166,7 +166,7 @@ function GamesTableRow(props) {
 
       <Td 
         w='170px'
-        minW='170px'
+        minW='135px'
         border={lastItem && 'none'}
         borderBottomColor='#56577A'>
         <Text
@@ -179,7 +179,7 @@ function GamesTableRow(props) {
 
       <Td
         w='250px'
-        minW='250px'
+        minW='135px'
         border={lastItem && 'none'}
         borderBottomColor='#56577A'>
         <Text
@@ -192,11 +192,11 @@ function GamesTableRow(props) {
 
       <Td 
         w='150px'
-        minW='150px'
+        minW='80px'
         border={lastItem && 'none'}
         borderBottomColor='#56577A'>
         <Menu>
-          <MenuButton ml='25px'>
+          <MenuButton ml='20px'>
             <Icon 
               color='gray.400' 
               cursor='pointer'
@@ -217,7 +217,7 @@ function GamesTableRow(props) {
                 _focus={{ bg: 'brand.400' }}
                 _active={{ bg: 'brand.400' }}> 
 
-                <Flex p='12px' align='center' color='green.500' cursor='pointer'>
+                <Flex p='12px' justifyContent='center' color='green.500' cursor='pointer'>
                   <Icon as={FaPhotoFilm} me='4px' w='14px' h='14px' />
                   <Text fontSize='xs'>
                     Preview

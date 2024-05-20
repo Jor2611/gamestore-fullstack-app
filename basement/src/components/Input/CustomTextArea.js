@@ -12,13 +12,13 @@ const CustomTextArea = (props) => {
     rows, 
     width,
     resizable,
-    validate
+    validation
   } = props;
 
   const { field, fieldState: { error } } = useController({
     name,
     control,
-    rules: validate || null
+    rules: validation || null
   });
 
   return (
@@ -43,11 +43,6 @@ const CustomTextArea = (props) => {
             size="lg"
             w={width || "100%"}
             rows={rows || 6}
-            onChange={field.onChange}
-            onBlur={field.onBlur}
-            name={field.name}
-            value={field.value}
-            ref={field.ref}
             resize={resizable}
             placeholder={placeholder}
           />

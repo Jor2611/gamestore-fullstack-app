@@ -16,7 +16,7 @@ import avatar2 from "../../assets/img/avatars/avatar2.png";
 export const TopNavLinks = ({ signOut }) => {
   return (
     <Flex
-      w={{ sm: '110px', lg: '75px' }}
+      w={{ xs: '110px', lg: '75px' }}
       alignItems='center'
       flexDirection='row'
       justifyContent='space-between'

@@ -1,10 +1,13 @@
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Flex, Text } from '@chakra-ui/react';
 
 const PaginationSelector = ({ count, select, currentPage }) => {
 
   const PageButton = ({ number, isActive, select }) => (
-    <Box 
-      p='10px'
+    <Flex 
+      h='40px'
+      w='35px'
+      justifyContent='center'
+      alignItems='center'
       cursor='pointer'
       borderRadius='5px' 
       border='1px solid gray'
@@ -13,7 +16,7 @@ const PaginationSelector = ({ count, select, currentPage }) => {
       onClick={() => select(number)}
     >
       <Text fontSize='medium' color='#FFF'>{number}</Text>
-    </Box>
+    </Flex>
   )
 
   const RegularPageSelector = Array

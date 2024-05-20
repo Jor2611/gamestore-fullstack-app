@@ -31,7 +31,8 @@ export default function Gallery({ images }) {
         style={{
           '--swiper-navigation-color': '#fff',
           '--swiper-pagination-color': '#fff',
-          'margin': '5px' 
+          'margin': '5px',
+          'maxHeight': '100px'
         }}
         onSwiper={setThumbsSwiper}
         spaceBetween={10}

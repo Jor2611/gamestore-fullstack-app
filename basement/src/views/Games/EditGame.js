@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useCallback } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Flex, Text, Grid, GridItem, Button } from '@chakra-ui/react';
@@ -13,23 +13,13 @@ import CustomSelect from '../../components/Input/CustomSelect';
 import CustomTextArea from '../../components/Input/CustomTextArea';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 import { LayoutContext } from '../../store/LayoutContext';
-import { fetchGame, updateGame } from '../../utils/http';
+import { fetchGame, updateGame } from '../../utils/requestManager';
+import { AlertContext } from '../../store/AlertContext';
+import { gameEntityToFormAdapter, gameFormToEntityAdapter } from '../../utils/adapters';
+import { FormInitialValues, FormValidation } from '../../utils/formManager';
 
-let initialValues = {
-  name: '',
-  slug: '',  
-  background_image: '',
-  description: '',
-  released: '',
-  rating: 0,
-  metacritic: 0,
-  clip: '',
-  publisher: '',
-  genres:[],
-  platforms:[],
-  short_screenshots: []
-};
-
+const initialValues = FormInitialValues.editGame;
+const validation = FormValidation.editGame;
 
 const EditGame = () => {
   const { gameId } = useParams();
@@ -37,120 +27,62 @@ const EditGame = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-
+  
   const { genres, platforms } = useContext(LayoutContext);
-
-  useEffect(() => {
-    async function fetchGameData(){
-      try{
-        const response = await fetchGame(gameId);
-        const { gallery, ...gameData } = response.data;
-        const adaptedGameData = { ...gameData, short_screenshots: gallery.map((item,i) => ({ id: i, image: item })) };
-        setFetchedGame(prevState => ({ ...prevState, ...adaptedGameData }));
-        reset(adaptedGameData);
-      }catch(err){
-        console.log(err);
-      }
-    }
-
-    fetchGameData();
-  },[gameId,navigate]);
-
-
-  const { 
+  const { showAlert } = useContext(AlertContext);
+  
+  const {
     reset,
     watch,
     control,
     getValues,
     handleSubmit,
-    formState: { 
-      isDirty,
-      isSubmitting
-    } 
+    formState: { isDirty, isSubmitting }
   } = useForm({ defaultValues: initialValues });
 
-
-  const watchForAllFields = watch();
-
-  useEffect(() => {
-    const values = getValues();
-    setShowPreview(JSON.stringify(initialValues)!==JSON.stringify(values))
-  },[watchForAllFields]);
-
-  
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'short_screenshots'
   });
 
-  const validate = {
-    name: { required: true },
-    publisher: { required: true },
-    slug: { required: "At least 2 characters", minLength: 2 },
-    released: { required: true, minLength: 6 },
-    rating: { 
-      required: "Value must be in range 1 and 5", 
-      min: 1, 
-      max: 5
-    },
-    metacritic: {
-      required: "Value must be in range 0 and 100", 
-      min: 0, 
-      max: 100
-    },
-    genres: { required: 'At least one option required!' },
-    platforms: { required: 'At least one option required!' },
-    description: { 
-      required: 'Required characters range is 50-700!', 
-      minLength: 50, 
-      maxLength: 700 
-    },
-    background_image: { 
-      pattern: { 
-        value: new RegExp ('^(https?://)'), 
-        message: 'Value must be a URL' 
-      }, 
-      required: true 
-    },
-    clip: { 
-      pattern: { 
-        value: new RegExp ('^(https?://)'), 
-        message: 'Value must be a URL' 
-      }, 
-      required: false 
-    },
-    screenshots: { 
-      pattern: { 
-        value: new RegExp ('^(https?://)'), 
-        message: 'Value must be a URL' 
-      }, 
-      required: false 
-    }
-  };
+  useEffect(() => {
+    const fetchGameData = async () => {
+      try {
+        const response = await fetchGame(gameId);
+        const adaptedData = gameEntityToFormAdapter(response.data);
+        console.log(adaptedData)
+        setFetchedGame(adaptedData);
+        reset(adaptedData);
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
-  const adaptData = async(data) => {
-    let adaptedData = data; 
-    adaptedData.genreIds = adaptedData.genres.map(item => item.id);
-    adaptedData.platformIds = adaptedData.platforms.map(item => item.id);
-    adaptedData.gallery = adaptedData.short_screenshots.map(item => item.image);
-    adaptedData.rating = parseFloat(adaptedData.rating);
-    adaptedData.metacritic = parseInt(adaptedData.metacritic);
-    delete adaptedData.short_screenshots;
-    return adaptedData;
-  };
+    fetchGameData();
+  }, [gameId, reset]);
 
-  const onSubmit = async(data) => {
-    try{
+  const watchForAllFields = watch();
+
+  useEffect(() => {
+    setShowPreview(JSON.stringify(initialValues) !== JSON.stringify(getValues()));
+  }, [watchForAllFields, getValues]);
+
+
+  const onSubmit = useCallback(async (data) => {
+    try {
       setIsLoading(true);
-      const adaptedData = await adaptData(data);
+      const adaptedData = gameFormToEntityAdapter(data);
       const response = await updateGame(gameId, adaptedData);
-      navigate('/game', { replace: true });      
-    }catch(err){
-      console.log(err);
-    }finally{
+      if (response.success) {
+        showAlert(response.msg);
+        navigate('/game', { replace: true });
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
       setIsLoading(false);
     }
-  };
+  }, [gameId, navigate, showAlert]);
 
   return (
     <Flex direction='column' pt={{ base: "120px", md: "75px" }} mx='auto'>
@@ -158,11 +90,7 @@ const EditGame = () => {
       <Grid templateColumns={"1fr"}>
         <Card overflowX={{ xs: "scroll", xl: "hidden" }} pb='0px'>
           <CardHeader p='6px 0px 22px 0px'>
-            <Flex
-              justify='space-between'
-              align='center'
-              w='100%'
-            >
+            <Flex justify='space-between' align='center'w='100%'>
               <Text fontSize='lg' color='#fff' fontWeight='bold'>
                 Edit Game
               </Text>
@@ -171,264 +99,75 @@ const EditGame = () => {
           <Separator/>
           <CardBody>
             <form style={{ width: '100%' }} onSubmit={handleSubmit(onSubmit)}>
-              <Grid 
-                templateColumns={'repeat(1,1fr)'} 
-                w='100%' 
-                h="45px" 
-                my={{ xs:"40px", md: "20px"}}
-                textAlign='center' 
-                gap={6}
-              >
+              <Grid templateColumns={'repeat(1,1fr)'} w='100%' h="45px" my={{ xs:"40px", md: "20px"}} textAlign='center' gap={6}>
                 <Text fontSize={{ xs: "small", md: 'medium' }} color='#FFF'>
                   <Text as='b'>Attention: </Text>Recommended to fetch data from 3rd party resource (rawg.io). Use "Fetch Data" button on the top for doing so!
                 </Text>
               </Grid>
-              <Grid templateColumns={{ xs: '1fr', lg: '56% 42%' }} 
-                w='100%' 
-                my={"20px"} 
-                gap={6}
-              >
+              <Grid templateColumns={{ xs: '1fr', lg: '56% 42%' }} w='100%' my={"20px"} gap={6}>
                 {/* General form */}
                 <GridItem w='100%'>
-                  <Grid 
-                    templateColumns={{ 
-                      xs: 'repeat(1,1fr)', 
-                      md: 'repeat(2,1fr)', 
-                      lg: 'repeat(1,1fr)', 
-                      xl: 'repeat(2,1fr)' 
-                    }} 
-                    w='100%' 
-                    my="10px" 
-                    gap={6}
-                  >
+                  <Grid templateColumns={{ xs: 'repeat(1,1fr)', md: 'repeat(2,1fr)', lg: 'repeat(1,1fr)', xl: 'repeat(2,1fr)' }} w='100%' my="10px" gap={6}>
+                    {[
+                      { name: 'name', label: 'Name', type: 'text', placeholder: 'Name', validation: validation.name },
+                      { name: 'publisher', label: 'Publisher', type: 'text', placeholder: 'Publishers name', validation: validation.publisher },
+                      { name: 'slug', label: 'Slug', type: 'text', placeholder: 'Slug', validation: validation.slug },
+                      { name: 'released', label: 'Released', type: 'text', placeholder: 'Release Date', validation: validation.released },
+                      { name: 'rating', label: 'Rating', type: 'number', placeholder: 'Game Rating', validation: validation.rating },
+                      { name: 'metacritic', label: 'Metacritic', type: 'number', placeholder: 'Metacritic Score', validation: validation.metacritic },
+                    ].map((input, index) => (
+                      <GridItem key={index} w="100%">
+                        <CustomInput {...input} control={control} />
+                      </GridItem>
+                    ))}
                     <GridItem w='100%'>
-                      <CustomInput
-                        label={'Name'}
-                        name={'name'}
-                        control={control}
-                        type='text'
-                        placeholder='Name'
-                        validate={validate.name}
-                      />
+                      <CustomSelect label={'Genres'} name={'genres'} control={control} options={genres} placeholder='Select genres' validation={validation.genres}/>
                     </GridItem>
-
+  
                     <GridItem w='100%'>
-                      <CustomInput
-                        label={'Publisher'}
-                        name={'publisher'}
-                        control={control}
-                        type='text'
-                        placeholder='Publishers name'
-                        validate={validate.publisher}
-                      />
-                    </GridItem>
-
-                    <GridItem w='100%'>
-                      <CustomInput
-                        label={'Slug'}
-                        name={'slug'}
-                        control={control}
-                        type='text'
-                        placeholder='Slug'
-                        validate={validate.slug}
-                      />
-                    </GridItem>
-
-                    <GridItem w='100%'>
-                      <CustomInput
-                        label={'Released'}
-                        name={'released'}
-                        control={control}
-                        type='text'
-                        placeholder='Release Date'
-                        validate={validate.released}            
-                      />
-                    </GridItem>
-
-                    <GridItem w='100%'>
-                      <CustomInput
-                        label={'Rating'}
-                        name={'rating'}
-                        control={control}
-                        type='number'
-                        placeholder='Game Rating'
-                        validate={validate.rating}
-                      />
-                    </GridItem>
-
-                    <GridItem w='100%'>
-                      <CustomInput
-                        label={'Metacritic'}
-                        name={'metacritic'}
-                        control={control}
-                        type='number'
-                        placeholder='Metacritic Score'
-                        validate={validate.metacritic}
-                      />
-                    </GridItem>
-
-                    <GridItem w='100%'>
-                      <CustomSelect
-                        label={'Genres'}
-                        name={'genres'}
-                        control={control}
-                        options={genres}
-                        placeholder='Select genres'
-                        validate={validate.genres}
-                      />
-                    </GridItem>
-
-                    <GridItem w='100%'>
-                      <CustomSelect
-                        label={'Platforms'}
-                        name={'platforms'}
-                        control={control}
-                        options={platforms}
-                        placeholder='Select Platforms'
-                        validate={validate.platforms}
-                      />
+                      <CustomSelect label={'Platforms'} name={'platforms'} control={control} options={platforms} placeholder='Select Platforms' validation={validation.platforms}/>
                     </GridItem>
                   </Grid>
-
-                  <Grid 
-                    templateColumns={'repeat(1,1fr)'} 
-                    w='100%' 
-                    my="10px" 
-                    gap={6}
-                  >
+  
+                  <Grid templateColumns={'repeat(1,1fr)'} w='100%' my="10px" gap={6}>
                     <GridItem w='100%'>
-                      <CustomTextArea
-                        label={'Description'}
-                        name={'description'}
-                        control={control}
-                        rows={6}
-                        resizable='none'
-                        placeholder='Game Description Goes Here...'
-                        validate={validate.description}
-                      />
+                      <CustomTextArea label={'Description'} name={'description'} control={control} rows={6} resizable='none' placeholder='Game Description Goes Here...' validation={validation.description}/>
                     </GridItem>
                   </Grid>
                 </GridItem>
-
+  
                 {/* Preview */}
-                <GridItem 
-                  w='100%' 
-                  display={{ xs: 'none', lg:'block' }} 
-                  rowSpan={2}
-                >
-                  {showPreview 
-                    ? <Preview control={control}/> 
-                    : <PreviewPlaceholder/>}
+                <GridItem w='100%' display={{ xs: 'none', lg:'block' }} rowSpan={2}>
+                  {showPreview ? <Preview control={control}/> : <PreviewPlaceholder/>}
                 </GridItem>
-
+  
                 {/* Gallery */}
-                <GridItem 
-                  w='100%' 
-                  rowSpan={2}
-                >
-                  <Grid 
-                    templateColumns={{ 
-                      xs: 'repeat(1,1fr)', 
-                      md: 'repeat(2,1fr)', 
-                      lg: 'repeat(1,1fr)', 
-                      xl: 'repeat(2,1fr)' 
-                    }} 
-                    w='100%' 
-                    my="10px" 
-                    gap={6}
-                  >
+                <GridItem w='100%' rowSpan={2}>
+                  <Grid templateColumns={{ xs: 'repeat(1,1fr)', md: 'repeat(2,1fr)', lg: 'repeat(1,1fr)', xl: 'repeat(2,1fr)' }} w='100%' my="10px" gap={6}>
                     <GridItem w='100%'>
-                      <CustomInput
-                        label={'Background Image URL'}
-                        name={'background_image'}
-                        control={control}
-                        type='text'
-                        placeholder='Image URL'
-                        validate={validate.background_image}
-                      />
+                      <CustomInput label={'Background Image URL'} name={'background_image'} control={control} type='text' placeholder='Image URL' validation={validation.background_image}/>
                     </GridItem>
-
                     <GridItem w='100%'>
-                      <CustomInput
-                        label={'Clip'}
-                        name={'clip'}
-                        control={control}
-                        type='text'
-                        placeholder='Clip URL'
-                        validate={validate.clip}
-                      />
+                      <CustomInput label={'Clip'} name={'clip'} control={control} type='text' placeholder='Clip URL' validation={validation.clip}/>
                     </GridItem>
-
+  
                     {fields.map((_, i) => (
                       <GridItem key={i} w='100%'>
-                        <CustomInput
-                          label={`Image ${i+1}`}
-                          name={`short_screenshots.${i}.image`}
-                          control={control}
-                          type='text'
-                          placeholder='Image URL'
-                          validate={validate.screenshots}
-                          remove={() => remove(i)}
-                        />
+                        <CustomInput label={`Image ${i+1}`} name={`short_screenshots.${i}.image`} control={control} type='text' placeholder='Image URL' validation={validation.screenshots} remove={() => remove(i)}/>
                       </GridItem>
                     ))}
                   </Grid>
-                  <Grid 
-                    templateColumns={'repeat(1,1fr)'} 
-                    w='100%' 
-                    my="10px" 
-                    gap={6}
-                  >
+                  <Grid templateColumns={'repeat(1,1fr)'} w='100%' my="10px" gap={6}>
                     <GridItem w='100%'>
-                      <Button
-                        variant='secondary'
-                        borderRadius='20px'
-                        fontSize='35px'
-                        w='100%'
-                        mt='20px'
-                        onClick={() => { append({ image: '' }) }}
-                      >
-                        +
-                      </Button>
+                      <Button variant='secondary' borderRadius='20px' fontSize='35px' w='100%' mt='20px' onClick={() => { append({ image: '' }) }}>+</Button>
                     </GridItem>  
                   </Grid>
                 </GridItem>
-
+  
                 {/* ACTIONS */}
-                <GridItem 
-                  w='100%'
-                  display={'flex'}
-                  flexDirection={{ xs: 'row', ms: 'column' }}
-                  justifyContent={{ xs: 'center', md:'flex-end' }}
-                  alignItems='center'
-                >
-                  <Button
-                    variant='secondary'
-                    fontSize='10px'
-                    maxW='350px'
-                    w={{ sm:'100%', md:'30%' }}
-                    h='46px'
-                    mx='10px'
-                    my='20px'
-                    onClick={() => reset({...fetchedGame})}
-                  >
-                    Reset
-                  </Button>
-                  <Button
-                    variant='brand'
-                    fontSize='10px'
-                    maxW='350px'
-                    w={{ xs:'100%', md:'30%' }}
-                    h='46px'         
-                    mx='10px'
-                    my='20px'
-                    type='submit'
-                    loadingText='Creating...'  
-                    isLoading={isSubmitting}
-                    isDisabled={!isDirty || isSubmitting}
-                  >
-                    Update
-                  </Button>
+                <GridItem w='100%' display={'flex'} flexDirection={{ xs: 'column', md: 'row' }} justifyContent={{ xs: 'center', md:'flex-end' }} alignItems='center'>
+                  <Button variant='secondary' fontSize='10px' maxW='350px' w={{ sm:'100%', md:'30%' }} h='46px' mx='10px' my='20px' onClick={() => { reset({...fetchedGame}) }}> Reset </Button>
+                  <Button variant='brand' fontSize='10px' maxW='350px' w={{ xs:'100%', md:'30%' }} h='46px'          mx='10px' my='20px' type='submit' loadingText='Creating...'   isLoading={isSubmitting} isDisabled={!isDirty || isSubmitting}> Update </Button>
                 </GridItem>
               </Grid>
             </form>
@@ -437,9 +176,17 @@ const EditGame = () => {
       </Grid>
     </Flex>
   )
-}
-
-
-
+};
 
 export default EditGame;
+
+
+
+
+
+
+
+
+
+
+

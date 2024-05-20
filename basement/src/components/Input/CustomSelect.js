@@ -11,9 +11,8 @@ const CustomSelect = (props) => {
     label, 
     placeholder,
     control, 
-    options,
-    width, 
-    validate
+    options, 
+    validation
   } = props;
 
   const style = {
@@ -64,7 +63,7 @@ const CustomSelect = (props) => {
   const { field, fieldState: { error } } = useController({
     name,
     control,
-    rules: validate || null
+    rules: validation || null
   });
 
   return (
@@ -84,11 +83,6 @@ const CustomSelect = (props) => {
           isMulti
           variant="filled"
           chakraStyles={style}
-          onChange={field.onChange}
-          onBlur={field.onBlur}
-          name={field.name}
-          value={field.value}
-          ref={field.ref}
           options={options}
           placeholder={placeholder}
         />

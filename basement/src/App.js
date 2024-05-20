@@ -1,5 +1,6 @@
 import { BrowserRouter as Router } from "react-router-dom";
 import AppNavigation from "./Navigation";
+import AlertContextProvider from "./store/AlertContext";
 import AdminContextProvider from "./store/AdminContext";
 import GamesContextProvider from "./store/GamesContext";
 import LayoutContextProvider from "./store/LayoutContext";
@@ -7,6 +8,7 @@ import LayoutContextProvider from "./store/LayoutContext";
 function App() {
   return (
     <>
+      <AlertContextProvider>
       <AdminContextProvider>
       <LayoutContextProvider>
       <GamesContextProvider>
@@ -16,6 +18,7 @@ function App() {
       </GamesContextProvider>
       </LayoutContextProvider>
       </AdminContextProvider>
+      </AlertContextProvider>
     </>
   );
 }

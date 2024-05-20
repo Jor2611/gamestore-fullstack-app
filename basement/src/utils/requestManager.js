@@ -8,7 +8,7 @@ backendAPI.interceptors.response.use(
   error => {
     if (error.response) {
       if(error.response.status === 401){
-        error.response.data.msg = 'Session Expired';
+        error.response.data.msg = 'SESSION_EXPIRED';
         eventEmitter.emit('unauthorized');
       }
 

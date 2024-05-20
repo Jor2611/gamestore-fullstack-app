@@ -568,7 +568,7 @@ export const FulgerIcon = createIcon({
       xmlns='http://www.w3.org/2000/svg'>
       <path
         d='M5.74999 23.25H4.49999L5.74999 14.5H0.424988C0.424988 14.5 5.02499 6.425 8.24999 0.75H9.49999L8.24999 9.5H13.6L5.74999 23.25Z'
-        fill='#09AD8F'
+        fill='currentColor'
       />
     </svg>
   ),

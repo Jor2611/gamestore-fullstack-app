@@ -3,20 +3,23 @@ import { Navigate, Routes, Route } from 'react-router-dom';
 import { CircularProgress, Box } from '@chakra-ui/react'
 import { AdminContext } from './store/AdminContext';
 import { eventEmitter } from './utils/eventEmitter';
-import { checkToken, loadGenres, loadPlatforms } from './utils/http';
+import { checkToken, loadGenres, loadPlatforms } from './utils/requestManager';
 import { LayoutContext } from './store/LayoutContext';
+import { AlertContext } from './store/AlertContext';
 import BasementLayout from './views/Basement';
 import LoginForm from './views/LoginForm';
 import Games from './views/Games/Games';
 import Orders from './views/Orders/Orders';
 import AddGame from './views/Games/AddGame';
 import EditGame from './views/Games/EditGame';
+import KeyManagement from './views/Keys/KeyManagement';
 
 
 export default function AppNavigation() {
   const [isAdminLoading, setIsAdminLoading] = useState(true);
   const { isAuthenticated: isAdminAuth, authenticateAdmin, signoutAdmin } = useContext(AdminContext);
   const { loadLayoutData } = useContext(LayoutContext);
+  const { showAlert } = useContext(AlertContext);
 
   useEffect(() => {
     const adminToken = localStorage.getItem('admin_token');
@@ -45,6 +48,7 @@ export default function AppNavigation() {
 
     function handleUnauthorized(){
       signoutAdmin();
+      showAlert('SESSION_EXPIRED')
     }
 
     eventEmitter.on('unauthorized', handleUnauthorized);
@@ -52,7 +56,6 @@ export default function AppNavigation() {
     return () => {
       eventEmitter.removeListener('unauthorized', handleUnauthorized);
     };
-    
   },[]);
 
   if(isAdminLoading){
@@ -67,6 +70,7 @@ export default function AppNavigation() {
         {isAdminAuth && <Route path='games/new' element={<AddGame/>}/>}
         {isAdminAuth && <Route path='games/:gameId/edit' element={<EditGame/>}/>}
         {isAdminAuth && <Route path='orders' element={<Orders/>}/>}
+        {isAdminAuth && <Route path='keys' element={<KeyManagement/>}/>}
         <Route path='*' element={<Navigate to='/games' replace/>}/>
       </Route>
       <Route path='*' element={<Navigate to='/' replace/>}/>

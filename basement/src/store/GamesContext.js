@@ -13,7 +13,6 @@ function GamesContextProvider({ children }) {
 
   function deleteGameData(id) {
     const filteredGames = gamesState.games.filter((item) => item.id !== id);
-    console.log(filteredGames);
     setGamesState({ games: filteredGames })
   }
 

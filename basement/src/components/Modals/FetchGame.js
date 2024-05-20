@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { 
   Button, 
@@ -11,12 +11,13 @@ import {
   ModalOverlay,
   Flex, 
   Box,
-  useToast
 } from '@chakra-ui/react';
-import { findMatchedGames } from '../../utils/http';
+import { findMatchedGames } from '../../utils/requestManager';
+import { AlertContext } from '../../store/AlertContext';
 import { Separator } from '../Separator/Separator';
 import CustomInput from '../Input/CustomInput';
 import FetchedGamesList from '../Menu/FetchedGamesList';
+
 
 
 const FetchGame = ({ isOpen, onClose, setFetched }) => {
@@ -26,7 +27,7 @@ const FetchGame = ({ isOpen, onClose, setFetched }) => {
   const [selectedGame, setSelectedGame] = useState(null);
   const [isDataLoading, setIsDataLoading] = useState(false);
 
-  const toast = useToast();
+  const { showAlert } = useContext(AlertContext);
   const { 
     control, 
     handleSubmit, 
@@ -44,14 +45,7 @@ const FetchGame = ({ isOpen, onClose, setFetched }) => {
       setFetchedGames(result.slice(0,7));
     } catch (error) {
       console.error('Submission failed', error);
-      toast({
-        position: 'bottom-left',
-        render:() => (
-          <Box color='white' p={3} bg='red.500'>
-            Issues on API's side, try later again!
-          </Box>
-        )
-      })
+      showAlert('3RD_PARTY_ISSUE');
     } finally {
       setIsDataLoading(false);
     }
@@ -59,7 +53,6 @@ const FetchGame = ({ isOpen, onClose, setFetched }) => {
 
   const handleApply = () => {
     setFetched(selectedGame);
-    console.log(selectedGame);
     setFetchedGames([]);
     setSelectedGame(null);
     setValue('query','');

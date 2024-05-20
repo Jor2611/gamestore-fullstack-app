@@ -1,8 +1,11 @@
 import { Box, Flex, Link } from '@chakra-ui/react';
+import { useContext } from 'react';
+import { AlertContext } from '../../store/AlertContext';
 import NavBreadCrumbs from './NavBreadCrumbs';
 import { TopNavLinks } from './TopNavLinks';
 
 const TopNavbar = ({ signOut }) => {
+  const { showAlert } = useContext(AlertContext);
   return (
     <Flex
       position={'absolute'}

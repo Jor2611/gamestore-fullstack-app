@@ -22,13 +22,13 @@ const CustomInput = (props) => {
     width,
     height,
     remove,
-    validate
+    validation
   } = props;
 
   const { field, fieldState: { error } } = useController({
     name,
     control,
-    rules: validate || null
+    rules: validation || null
   });
 
   return (
@@ -63,11 +63,6 @@ const CustomInput = (props) => {
           size="lg"
           w={width || "100%"}
           h={height || '46px'}
-          onChange={field.onChange}
-          onBlur={field.onBlur}
-          name={field.name}
-          value={field.value}
-          ref={field.ref}
           type={type || 'text'}
           placeholder={placeholder}
         />
