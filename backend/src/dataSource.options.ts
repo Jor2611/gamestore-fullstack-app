@@ -9,7 +9,7 @@ let dsOptions: DataSourceOptions;
 
 switch(process.env.NODE_ENV){
  
-  case "dev":
+  case "development":
     dsOptions = {
       type: 'postgres',
       host: process.env.PG_HOST,
