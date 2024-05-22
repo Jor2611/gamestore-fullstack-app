@@ -63,7 +63,7 @@ To see current stage of the application follow the steps below.
       ```bash
       curl -X POST http://localhost:5000/api/account/basement \
         -H "Content-Type: application/json" \
-        -d '{"email": "gago@mail.com", "password": "asd123456"}'
+        -d '{"email": "dummy@gmail.com", "password": "asd123456"}'
       ```
 
 5. **Open page in browser**: http://localhost:5000
