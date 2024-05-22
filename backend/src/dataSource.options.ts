@@ -22,6 +22,19 @@ switch(process.env.NODE_ENV){
       synchronize: true
     };
     break;
+  case "docker":
+    dsOptions = {
+      type: 'postgres',
+      host: process.env.PG_HOST,
+      port: +process.env.PG_PORT,
+      username: process.env.PG_USERNAME,
+      password: process.env.PG_PASSWORD,
+      database: process.env.PG_DATABASE,
+      migrations: [join(__dirname, '..', 'migrations/*.js')],
+      entities: [join(__dirname, '..', '**/*.entity.js')],
+      synchronize: true
+    };
+    break;
   case "test":
     dsOptions = {
       type: 'postgres',
