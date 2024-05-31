@@ -1,11 +1,11 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@chakra-ui/react';
 
-const NavBreadCrumbs = ({ path }) => {
+const NavBreadCrumbs = () => {
   const location = useLocation(); 
   const navigate = useNavigate();
 
-  const paths = path ? path.split('/').slice(1) : location.pathname.split('/').slice(1);
+  const paths = location.pathname.split('/').slice(1);
 
   return (
     <Breadcrumb separator='>'>

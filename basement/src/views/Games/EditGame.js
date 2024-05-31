@@ -2,6 +2,10 @@ import { useContext, useEffect, useState, useCallback } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Flex, Text, Grid, GridItem, Button } from '@chakra-ui/react';
+import { fetchGame, updateGame } from '../../api/gameApi';
+import { LayoutContext } from '../../store/LayoutContext';
+import { gameEntityToFormAdapter, gameFormToEntityAdapter } from '../../utils/adapters';
+import { FormInitialValues, FormValidation } from '../../utils/formManager';
 import { Separator } from '../../components/Separator/Separator';
 import Card from '../../components/Card/Card';
 import CardHeader from '../../components/Card/CardHeader';
@@ -12,11 +16,6 @@ import PreviewPlaceholder from '../../components/Preview/PreviewPlaceholder';
 import CustomSelect from '../../components/Input/CustomSelect';
 import CustomTextArea from '../../components/Input/CustomTextArea';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
-import { LayoutContext } from '../../store/LayoutContext';
-import { fetchGame, updateGame } from '../../utils/requestManager';
-import { AlertContext } from '../../store/AlertContext';
-import { gameEntityToFormAdapter, gameFormToEntityAdapter } from '../../utils/adapters';
-import { FormInitialValues, FormValidation } from '../../utils/formManager';
 
 const initialValues = FormInitialValues.editGame;
 const validation = FormValidation.editGame;
@@ -29,7 +28,6 @@ const EditGame = () => {
   const navigate = useNavigate();
   
   const { genres, platforms } = useContext(LayoutContext);
-  const { showAlert } = useContext(AlertContext);
   
   const {
     reset,
@@ -50,7 +48,6 @@ const EditGame = () => {
       try {
         const response = await fetchGame(gameId);
         const adaptedData = gameEntityToFormAdapter(response.data);
-        console.log(adaptedData)
         setFetchedGame(adaptedData);
         reset(adaptedData);
       } catch (err) {
@@ -74,7 +71,6 @@ const EditGame = () => {
       const adaptedData = gameFormToEntityAdapter(data);
       const response = await updateGame(gameId, adaptedData);
       if (response.success) {
-        showAlert(response.msg);
         navigate('/game', { replace: true });
       }
     } catch (err) {
@@ -82,7 +78,7 @@ const EditGame = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [gameId, navigate, showAlert]);
+  }, [gameId, navigate]);
 
   return (
     <Flex direction='column' pt={{ base: "120px", md: "75px" }} mx='auto'>

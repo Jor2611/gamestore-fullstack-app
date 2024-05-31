@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { 
   Button, 
@@ -12,8 +12,7 @@ import {
   Flex, 
   Box,
 } from '@chakra-ui/react';
-import { findMatchedGames } from '../../utils/requestManager';
-import { AlertContext } from '../../store/AlertContext';
+import { findMatchedGames } from '../../api/rawgApi';
 import { Separator } from '../Separator/Separator';
 import CustomInput from '../Input/CustomInput';
 import FetchedGamesList from '../Menu/FetchedGamesList';
@@ -27,7 +26,6 @@ const FetchGame = ({ isOpen, onClose, setFetched }) => {
   const [selectedGame, setSelectedGame] = useState(null);
   const [isDataLoading, setIsDataLoading] = useState(false);
 
-  const { showAlert } = useContext(AlertContext);
   const { 
     control, 
     handleSubmit, 
@@ -45,7 +43,6 @@ const FetchGame = ({ isOpen, onClose, setFetched }) => {
       setFetchedGames(result.slice(0,7));
     } catch (error) {
       console.error('Submission failed', error);
-      showAlert('3RD_PARTY_ISSUE');
     } finally {
       setIsDataLoading(false);
     }

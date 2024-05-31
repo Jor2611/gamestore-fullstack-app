@@ -1,20 +1,15 @@
+import { memo } from 'react';
 import {
   Avatar,
   Badge,
   Flex,
-  Menu,
-  MenuButton,
   Icon,
-  MenuItem,
-  MenuList,
   Td,
   Text,
   Tr,
 } from '@chakra-ui/react';
-import { FaEllipsisVertical, FaPencil, FaTrashCan, FaPhotoFilm } from 'react-icons/fa6';
-import { useNavigate } from 'react-router-dom';
 import { adaptToUpdateDate } from '../../utils/dateManager';
-import GamesTableRowSkeleton from '../Skeletons/GamesTableRowSkeleton';
+import ActionsMenu from '../Menu/ActionsMenu';
 
 
 function GamesTableRow(props) {
@@ -36,11 +31,6 @@ function GamesTableRow(props) {
     deleteDialogHandler
   } = props;
 
-  // if(isLoading){
-  //   return <GamesTableRowSkeleton lastItem={lastItem}/>
-  // }
-
-  const navigate = useNavigate();
 
   return (
     <Tr>
@@ -63,6 +53,7 @@ function GamesTableRow(props) {
             bg='none'
             border='none'
             borderRadius='12px'
+            loading='lazy'
             icon={<Icon color='transparent'/>}
           />
 
@@ -195,74 +186,10 @@ function GamesTableRow(props) {
         minW='80px'
         border={lastItem && 'none'}
         borderBottomColor='#56577A'>
-        <Menu>
-          <MenuButton ml='20px'>
-            <Icon 
-              color='gray.400' 
-              cursor='pointer'
-              as={FaEllipsisVertical} 
-            />   
-          </MenuButton>
-          <MenuList
-            bg='linear-gradient(127.09deg, rgba(6, 11, 40, 0.94) 19.41%, rgba(10, 14, 35, 0.69) 76.65%)'
-            border='transparent'
-            borderRadius='20px'
-            backdropFilter='blur(63px)'>
-
-            <Flex flexDirection='column'>
-              <MenuItem
-                bg='inherit'
-                borderRadius='8px'
-                _hover={{ bg: 'brand.400' }}
-                _focus={{ bg: 'brand.400' }}
-                _active={{ bg: 'brand.400' }}> 
-
-                <Flex p='12px' justifyContent='center' color='green.500' cursor='pointer'>
-                  <Icon as={FaPhotoFilm} me='4px' w='14px' h='14px' />
-                  <Text fontSize='xs'>
-                    Preview
-                  </Text>
-                </Flex>   
-
-              </MenuItem>
-              <MenuItem
-                bg='inherit'
-                borderRadius='8px'
-                _hover={{ bg: 'brand.400' }}
-                _focus={{ bg: 'brand.400' }}
-                _active={{ bg: 'brand.400' }}
-                onClick={() => navigate(`${id}/edit`)}>
-
-                <Flex p='12px' align='center' cursor='pointer'>
-                  <Icon as={FaPencil} w='14px' h='14px' me='4px'/>
-                  <Text fontSize='xs' color='gray.400'>
-                    Edit
-                  </Text>
-                </Flex>
-
-              </MenuItem>
-              <MenuItem
-                bg='inherit'
-                borderRadius='8px'
-                _hover={{ bg: 'brand.400' }}
-                _focus={{ bg: 'brand.400' }}
-                _active={{ bg: 'brand.400' }}
-                onClick={deleteDialogHandler}>
-
-                <Flex p='12px' align='center' color='red.500' cursor='pointer'>
-                  <Icon as={FaTrashCan} w='14px' h='14px' me='4px'/>
-                  <Text fontSize='xs'>
-                    Delete
-                  </Text>
-                </Flex> 
-              
-              </MenuItem>
-            </Flex>
-          </MenuList>
-        </Menu>
+        <ActionsMenu id={id} deleteDialogHandler={deleteDialogHandler}/>
       </Td>
     </Tr>
   );
 }
 
-export default GamesTableRow;
+export default memo(GamesTableRow);

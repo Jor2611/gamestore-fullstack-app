@@ -1,6 +1,5 @@
 import { useLocation } from "react-router-dom";
 import { Box, Stack } from "@chakra-ui/react";
-import PropTypes from "prop-types";
 import Brand from "./Brand";
 import SidebarNavButton from "./SidebarNavButton";
 import routes from "../../navs";
@@ -48,11 +47,5 @@ function Sidebar({ logoText }) {
     </Box>
   );
 }
-
-Sidebar.propTypes = {
-  logoText: PropTypes.string,
-  routes: PropTypes.arrayOf(PropTypes.object),
-  variant: PropTypes.string,
-};
 
 export default Sidebar;

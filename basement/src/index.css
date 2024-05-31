@@ -13,6 +13,30 @@
   transition-delay: 200ms;
 }
 
+.sidebar-btn-active {
+  background-color: #1A1F37;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(42px);
+  transition: 0.2s linear;
+}
+
+.icon-box {
+  height: 30px;
+  width: 30px;
+  margin-right: 12px;
+  transition: 0.2s linear;
+}
+
+.icon-box.active {
+  background-color: #2FC7F0;
+  color: white;
+}
+
+.sidebar-nav-button-text.active {
+  color: white;
+}
+
+
 ::-webkit-scrollbar {
   width: 9px;
   height: 8px;
@@ -53,3 +77,22 @@
 ::-webkit-scrollbar-thumb:horizontal:hover {
   cursor: pointer;
 }
+
+/* Toaster */
+
+/* 
+.Toastify__toast-theme--colored.Toastify__toast--default {
+}
+.Toastify__toast-theme--colored.Toastify__toast--info {
+}
+.Toastify__toast-theme--colored.Toastify__toast--success {
+  background-color: cyan;
+  color: #F7FAFC
+}
+.Toastify__toast-theme--colored.Toastify__toast--warning {
+}
+.Toastify__toast-theme--colored.Toastify__toast--error {
+  background-color: #C53030;
+  color: #F7FAFC
+} 
+*/

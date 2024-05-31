@@ -28,8 +28,8 @@ function GamesTableRowSkeleton(props) {
           align='center' 
           flexWrap='nowrap'>  
           <Skeleton
-            w='60px'
-            h='60px'
+            w='55px'
+            h='55px'
             me='18px'
             border='none'
             borderRadius='12px'

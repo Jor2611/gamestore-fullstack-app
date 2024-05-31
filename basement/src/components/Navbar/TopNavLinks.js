@@ -5,7 +5,8 @@ import {
   MenuList, 
   MenuItem, 
   Tooltip, 
-  Icon 
+  Icon, 
+  Show
 } from '@chakra-ui/react';
 import { FaBell, FaPersonWalkingArrowRight } from 'react-icons/fa6';
 import { ItemContent } from '../Menu/ItemContent';
@@ -21,7 +22,9 @@ export const TopNavLinks = ({ signOut }) => {
       flexDirection='row'
       justifyContent='space-between'
     >
-      <SidebarResponsive iconColor={'#FFF'} logoText={'PLAYON BASEMENT'}/>
+      <Show below='lg'>
+        <SidebarResponsive iconColor={'#FFF'} logoText={'PLAYON BASEMENT'}/>
+      </Show>
       <Menu>
         <Tooltip label='Notifications' hasArrow fontSize='smaller'>
           <MenuButton>

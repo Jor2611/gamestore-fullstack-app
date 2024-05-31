@@ -13,11 +13,10 @@ import CustomSelect from '../../components/Input/CustomSelect';
 import CustomTextArea from '../../components/Input/CustomTextArea';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 import { Separator } from '../../components/Separator/Separator';
-import { LayoutContext } from '../../store/LayoutContext';
-import { AlertContext } from '../../store/AlertContext';
-import { createGame } from '../../utils/requestManager';
+import { createGame } from '../../api/gameApi';
 import { gameFormToEntityAdapter } from '../../utils/adapters';
 import { FormInitialValues, FormValidation } from '../../utils/formManager';
+import { LayoutContext } from '../../store/LayoutContext';
 
 const AddGame = () => {
   const [fetchedGame, setFetchedGame] = useState(null);
@@ -25,7 +24,6 @@ const AddGame = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
-  const { showAlert } = useContext(AlertContext);
   const { genres, genresMap, platforms, platformsMap } = useContext(LayoutContext);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -65,7 +63,6 @@ const AddGame = () => {
       setIsLoading(true);
       const response = await createGame(adaptedData);
       if (response.success) {
-        showAlert(response.msg);
         navigate('/game', { replace: true });
       }
     } catch (err) {
@@ -73,7 +70,7 @@ const AddGame = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [navigate, showAlert]);
+  }, [navigate]);
 
   return (
     <Flex direction="column" pt={{ base: "120px", md: "75px" }} mx="auto">
