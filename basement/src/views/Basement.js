@@ -1,6 +1,8 @@
-import { useContext, useRef } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Box, ChakraProvider, Hide } from '@chakra-ui/react';
+import { loadGenres, loadPlatforms } from '../api/layoutApi';
+import { LayoutContext } from '../store/LayoutContext';
 import { AdminContext } from '../store/AdminContext';
 import theme from '../theme/themeAdmin';
 import Sidebar from '../components/Sidebar/Sidebar';
@@ -8,8 +10,24 @@ import TopNavbar from '../components/Navbar/TopNavbar';
 import MainPanel from '../components/Layout/MainPanel';
 import PanelContainer from '../components/Layout/PanelContainer';
 
+
 export default function BasementLayout(){
   const { signoutAdmin } = useContext(AdminContext);
+  const { loadLayoutData } = useContext(LayoutContext);
+
+  useEffect(() => {
+    async function fetchLayoutData(){
+      try{
+        const genres = await loadGenres();
+        const platforms = await loadPlatforms();
+        loadLayoutData({ genres, platforms });
+      }catch(err){
+        console.log(err);
+      }
+    }
+
+    fetchLayoutData();
+  },[]);
 
   return (
     <ChakraProvider theme={theme}>

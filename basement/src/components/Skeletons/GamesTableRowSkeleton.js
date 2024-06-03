@@ -19,7 +19,7 @@ function GamesTableRowSkeleton(props) {
       <Td
         ps='0px'
         w='330px'
-        minW='330px'
+        minW='200px'
         border={lastItem && "none"}
         borderBottomColor='#56577A'>
         <Flex 
@@ -28,32 +28,32 @@ function GamesTableRowSkeleton(props) {
           align='center' 
           flexWrap='nowrap'>  
           <Skeleton
-            w='55px'
-            h='55px'
+            w='60px'
+            h='60px'
             me='18px'
             border='none'
             borderRadius='12px'
           />
 
           <Flex direction='column' w='45%'>
-            <SkeletonText noOfLines={2}/>
+            <SkeletonText noOfLines={2} width='180px'/>
           </Flex>
         </Flex>
       </Td>
 
       <Td
         w='180px'
-        minW='180px'
+        minW='150px'
         border={lastItem && "none"}
         borderBottomColor='#56577A'>
         <Flex direction='column'>
-          <SkeletonText  noOfLines={3}/>
+          <SkeletonText noOfLines={3}/>
         </Flex>
       </Td>
 
       <Td
         w='160px'
-        minW='160px'
+        minW='90px'
         border={lastItem && "none"}
         borderBottomColor='#56577A'
       >
@@ -64,7 +64,7 @@ function GamesTableRowSkeleton(props) {
 
       <Td 
         w='100px'
-        minW='100px'
+        minW='80px'
         borderBottomColor='#56577A'
         border={lastItem && "none"} 
       >
@@ -79,7 +79,7 @@ function GamesTableRowSkeleton(props) {
 
       <Td 
         w='130px'
-        minW='130px'
+        minW='80px'
         border={lastItem && "none"} 
         borderBottomColor='#56577A'>
         <Flex justifyContent='center'>
@@ -93,7 +93,7 @@ function GamesTableRowSkeleton(props) {
 
       <Td
         w='170px'
-        minW='170px'
+        minW='135px'
         border={lastItem && "none"} 
         borderBottomColor='#56577A'>
         <SkeletonText w='60%' noOfLines={1}/>
@@ -101,7 +101,7 @@ function GamesTableRowSkeleton(props) {
 
       <Td
         w='250px'
-        minW='250px'
+        minW='135px'
         border={lastItem && "none"} 
         borderBottomColor='#56577A'>
         <SkeletonText w='75%' noOfLines={1}/>
@@ -109,7 +109,7 @@ function GamesTableRowSkeleton(props) {
 
       <Td 
         w='150px'
-        minW='150px'
+        minW='80px'
         border={lastItem && "none"} 
         borderBottomColor='#56577A'>
         <Icon

@@ -4,6 +4,7 @@ import {
   Badge,
   Flex,
   Icon,
+  Skeleton,
   Td,
   Text,
   Tr,
@@ -54,7 +55,12 @@ function GamesTableRow(props) {
             border='none'
             borderRadius='12px'
             loading='lazy'
-            icon={<Icon color='transparent'/>}
+            icon={<Skeleton
+              w='60px'
+              h='60px'
+              border='none'
+              borderRadius='12px'
+            />}
           />
 
           <Flex direction='column'>

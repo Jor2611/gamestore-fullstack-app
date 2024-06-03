@@ -20,6 +20,7 @@ import DeleteDialog from "../../components/Dialogs/DeleteDialog.js";
 import GamesTableRow from "../../components/Tables/GamesTablesRow";
 import TablePagination from "../../components/Pagination/TablePagination.js";
 import { fetchGameRows, deleteGame } from "../../api/gameApi.js";
+import GamesTableRowSkeleton from "../../components/Skeletons/GamesTableRowSkeleton.js";
 
 const PAGE_SIZE=10;
 
@@ -29,9 +30,8 @@ function Games() {
 
 	const navigate = useNavigate();
   const { isOpen: isDeleteDialogOpen, onOpen: openDeleteDialog, onClose: closeDeleteDialog } = useDisclosure();
-  console.log("games")
 
-  const { data: games, isLoading, isSuccess } = useQuery({
+  const { data: fetchedGames, isLoading, isRefetching, isSuccess } = useQuery({
     queryKey: ["games", currentPage],
     queryFn: () => fetchGameRows(currentPage, PAGE_SIZE),
     keepPreviousData: true
@@ -105,8 +105,8 @@ function Games() {
               </Tr>
             </Thead>
             <Tbody>
-              <LazyLoad delay={1300}>
-                {isSuccess && games?.data?.games.map((row, index, arr) =>  (
+              <LazyLoad key={currentPage} delay={1100} loaderComponent={<GamesTableRowSkeleton/>} componentCount={7}>
+                {isSuccess && fetchedGames?.data?.games.map((row, index, arr) =>  (
                   <GamesTableRow
                     key={index}
                     gameData={{
@@ -130,7 +130,7 @@ function Games() {
           </Table>
         </CardBody>
         <Flex justifyContent='flex-end' mt='25px' mr={{ sm: '25px', md: '45px'}}>
-          <TablePagination pageSize={PAGE_SIZE} rowsCount={games?.data?.count || 0} currentPage={currentPage} setCurrentPage={setCurrentPage}/>
+          <TablePagination pageSize={PAGE_SIZE} rowsCount={fetchedGames?.data?.count || 0} currentPage={currentPage} setCurrentPage={setCurrentPage}/>
         </Flex>
       </Card>
       {selectedForDeletion && (

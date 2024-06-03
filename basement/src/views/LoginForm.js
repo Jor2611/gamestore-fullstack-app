@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useRef } from 'react';
 import {
   Box,
   Flex,
@@ -14,10 +14,12 @@ import theme from "../theme/themeAuth.js";
 import signInImage from "../assets/img/signInImage.png";
 import CustomInput from '../components/Input/CustomInput.js';
 import CustomCheckbox from '../components/Input/CustomCheckbox.js';
+import { useMutation } from 'react-query';
 
 
 const LoginForm = () => {
   const adminCtx = useContext(AdminContext);
+  const requestRef = useRef({});
 
   const { control, handleSubmit } = useForm({
     defaultValues: { email: '', password: '', rememberMe: false }
@@ -25,7 +27,8 @@ const LoginForm = () => {
 
   const onSubmit = async (values) => {
     try {
-      const result = await adminSignIn(values);
+      requestRef.current.abort?.();
+      const result = await adminSignIn(values, { abort: (abort) => { requestRef.current.abort = abort }});
       if(result.success){
         adminCtx.authenticateAdmin({ id: result.data.id, token: result.data.token });
       }

@@ -41,12 +41,12 @@ const Preview = ({ control }) => {
             </GridItem>
             <GridItem w='100%'>
               <Text as='p'> 
-                <Text as='b'>Genre: &nbsp;</Text>{genres && genres.length && genres.map((genre,i) => (<Text as='span' key={i}>{i!==0 && ', '}{genre.label}</Text>))}
+                <Text as='b'>Genre: &nbsp;</Text>{genres && genres.map((genre,i) => (<Text as='span' key={i}>{i!==0 && ', '}{genre.label}</Text>))}
               </Text>
             </GridItem>
             <GridItem w='100%'>
               <Text as='p'>
-                <Text as='b'>Platforms: &nbsp;</Text>{platforms && platforms.length && platforms.map((platform,i) => (<Text as='span' key={i}>{i!==0 && ', '}{platform.label}</Text>))}
+                <Text as='b'>Platforms: &nbsp;</Text>{platforms && platforms.map((platform,i) => (<Text as='span' key={i}>{i!==0 && ', '}{platform.label}</Text>))}
               </Text>
             </GridItem>
             <GridItem w='100%'>

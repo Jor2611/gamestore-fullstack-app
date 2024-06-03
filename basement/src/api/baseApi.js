@@ -31,6 +31,7 @@ const withAbort = (fn) => {
       console.log("api error", error);
 
       if (didAbort(error)) {
+        console.log("CANCAELLED")
         error.aborted = true;
       }
 
