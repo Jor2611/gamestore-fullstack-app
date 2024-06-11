@@ -31,7 +31,7 @@ export class GameService {
       return await this.repository.save(game);
     }catch(err){
       console.log(err);
-      throw new InternalServerErrorException()
+      throw new InternalServerErrorException('SERVER_ERROR');
     }
   }
 
@@ -56,6 +56,8 @@ export class GameService {
 
   async update(id: number, data: UpdateGameDto){
     return await this.repository.manager.transaction(async (manager: EntityManager) => {
+      await manager.query(`SET lock_timeout = '20s';`);
+      
       const game = await manager.findOne(Game, { where: { id }, relations: ['genres', 'platforms'] });
 
       if (!game) {
@@ -96,7 +98,7 @@ export class GameService {
 
       return this.repository.remove(game);
     }catch(err){
-      console.log(err);
+      // console.log(err);
 
       if(err instanceof InternalServerErrorException){
         throw new InternalServerErrorException('SERVER_ERROR');

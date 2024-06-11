@@ -56,9 +56,7 @@ describe('AccountService', () => {
                 const account = accounts.find(account => account[key] === value);
                 resolve(account);
               });
-            },
-            create: () => {},
-            save: () => {},
+            }
           }
         },
         {
