@@ -47,11 +47,29 @@ describe('GameService', () => {
     findOne: jest.fn().mockImplementation(async(entityClass: EntityTarget<Game>, filter: FindOneOptions<Game>): Promise<Game> => {
       return games.find((_game) => _game.id === filter.where['id']) || null;
     }),
+    findBy: jest.fn().mockImplementation(async <T extends Genre | Platform>(entityClass: EntityTarget<T>, filter: FindOptionsWhere<T>): Promise<T[]> => {
+      if(entityClass === Platform){
+        const platformIds = (filter.id as any)._value; 
+        return mockPlatforms.filter(_platform => platformIds.includes(_platform.id)) as T[]; 
+      } else if(entityClass === Genre){
+        const genreIds = (filter.id as any)._value; 
+        return mockGenres.filter(_genre => genreIds.includes(_genre.id)) as T[];
+      } else {
+        return [];
+      }
+    }),
     create: jest.fn().mockImplementation((entityClass: EntityTarget<Game>, data: Object): Game => ({ ...data } as Game)),
-    save: jest.fn().mockImplementation(async(entityClass: EntityTarget<Game>, data: Game): Promise<Game> => {
-      const game = { ...data,  updatedAt: new Date() };
-      games.push(game);
-      return game;
+    save: jest.fn().mockImplementation(async(entityClass: EntityTarget<Game>, game: Game): Promise<Game> => {
+      const gameIndex = games.indexOf(game);
+      if(gameIndex > -1){
+        Object.assign(games[gameIndex], { ...game, updatedAt: new Date() });
+        return games[gameIndex];
+      }else {
+        const initialDate = new Date();
+        const newGame = { id: Math.floor(Math.random() * 10000), ...game, createdAt: initialDate, updatedAt: initialDate };
+        games.push(newGame);
+        return newGame;
+      }
     }),
     query: jest.fn()
   };
@@ -72,10 +90,16 @@ describe('GameService', () => {
             }),
             create: jest.fn().mockImplementation((data): Game => data),
             save: jest.fn().mockImplementation(async(game: Game) => {
-              const initialDate = new Date();
-              const newGame = { id: Math.floor(Math.random() * 10000), ...game, createdAt: initialDate, updatedAt: initialDate };
-              games.push(newGame);
-              return newGame;
+              const gameIndex = games.indexOf(game);
+              if(gameIndex > -1){
+                Object.assign(games[gameIndex], { ...game, updatedAt: new Date() });
+                return games[gameIndex];
+              }else {
+                const initialDate = new Date();
+                const newGame = { id: Math.floor(Math.random() * 10000), ...game, createdAt: initialDate, updatedAt: initialDate };
+                games.push(newGame);
+                return newGame;
+              }
             }),
             remove: jest.fn().mockImplementation(async(game: Game) => {
               games = games.filter((_game) => _game.id !== game.id);
@@ -226,6 +250,67 @@ describe('GameService', () => {
     expect(gamePage).toBeInstanceOf(Array);
     expect(gamePage).toHaveLength(10);
     expect(gameCount).toEqual(30);
+  });
+
+  it('should successfully update game details', async() => {
+    const spyOnEntityManagerFindOne = jest.spyOn(mockedManager, 'findOne');
+    const spyOnEntityManagerFindBy = jest.spyOn(mockedManager, 'findBy');
+    const spyOnEntityManagerSave = jest.spyOn(mockedManager, 'save');
+    const [genreIds, platformIds] = [[1,2,3],[2,1,5]];
+  
+    const { id } = await service.create({ ...mockGame, genreIds, platformIds });
+    const updatedGame = await service.update(id, { name: "Updated Game" })
+
+    expect(id).toBeDefined();
+    expect(spyOnEntityManagerFindOne).toHaveBeenCalled();
+    expect(spyOnEntityManagerFindOne).toHaveBeenCalledWith(Game, { where: { id }, relations: ['genres', 'platforms'] });
+    expect(spyOnEntityManagerFindBy).not.toHaveBeenCalled();
+    expect(spyOnEntityManagerSave).toHaveBeenCalled();
+    expect(updatedGame.id).toEqual(id);
+    expect(updatedGame.name).toEqual("Updated Game");
+  });
+
+  it('should throw a NotfoundException when calling update with non-existing game id', async() => {
+    const spyOnEntityManagerFindOne = jest.spyOn(mockedManager, 'findOne');
+    const spyOnEntityManagerFindBy = jest.spyOn(mockedManager, 'findBy');
+    const spyOnEntityManagerSave = jest.spyOn(mockedManager, 'save');
+    const [genreIds, platformIds] = [[1,2,3],[2,1,5]];
+  
+    const { id } = await service.create({ ...mockGame, genreIds, platformIds });
+    await expect(service.update(id+1, { name: "Updated Game" }))
+      .rejects.toThrow(NotFoundException);
+
+    expect(id).toBeDefined();
+    expect(spyOnEntityManagerFindOne).toHaveBeenCalled();
+    expect(spyOnEntityManagerFindOne).toHaveBeenCalledWith(Game, { where: { id: id+1 }, relations: ['genres', 'platforms'] });
+    expect(spyOnEntityManagerFindBy).not.toHaveBeenCalled();
+    expect(spyOnEntityManagerSave).not.toHaveBeenCalled();
+  });
+
+  it('should successfully update game details with platforms and genres included', async() => {
+    const spyOnEntityManagerFindOne = jest.spyOn(mockedManager, 'findOne');
+    const spyOnEntityManagerFindBy = jest.spyOn(mockedManager, 'findBy');
+    const spyOnEntityManagerSave = jest.spyOn(mockedManager, 'save');
+    const [genreIds, platformIds] = [[1,2,3],[2,1,5]];
+    const [updatedGenreIds, updatedPlatformIds] = [[4,5],[3,4,5]];
+  
+    const { id } = await service.create({ ...mockGame, genreIds, platformIds });
+    const updatedGame = await service.update(id, { name: "Updated Game", genreIds: updatedGenreIds, platformIds: updatedPlatformIds })
+
+    const isGenresUpdated = updatedGame.genres.every((_genre) => updatedGenreIds.includes(_genre.id));
+    const isPlatformUpdated = updatedGame.platforms.every((_platform) => updatedPlatformIds.includes(_platform.id));
+    
+    expect(id).toBeDefined();
+    expect(spyOnEntityManagerFindOne).toHaveBeenCalled();
+    expect(spyOnEntityManagerFindOne).toHaveBeenCalledWith(Game, { where: { id }, relations: ['genres', 'platforms'] });
+    expect(spyOnEntityManagerFindBy).toHaveBeenCalledTimes(2);
+    expect(spyOnEntityManagerSave).toHaveBeenCalled();
+    expect(updatedGame.id).toEqual(id);
+    expect(updatedGame.name).toEqual("Updated Game");
+    expect(updatedGame.genres).toHaveLength(updatedGenreIds.length);
+    expect(updatedGame.platforms).toHaveLength(updatedPlatformIds.length);
+    expect(isGenresUpdated).toBe(true);
+    expect(isPlatformUpdated).toBe(true);
   });
 
   it('should successfully delete a game', async() => {

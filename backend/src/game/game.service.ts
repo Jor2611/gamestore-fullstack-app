@@ -47,14 +47,13 @@ export class GameService {
     .skip(skip)
     .take(size);
 
-
     const games = await queryBuilder.getMany();
     const count = await queryBuilder.getCount();
   
     return { games, count };
   }
 
-  async update(id: number, data: UpdateGameDto){
+  async update(id: number, data: Partial<UpdateGameDto>){
     return await this.repository.manager.transaction(async (manager: EntityManager) => {
       await manager.query(`SET lock_timeout = '20s';`);
       
@@ -63,22 +62,24 @@ export class GameService {
       if (!game) {
         throw new NotFoundException("GAME_DOESN'T_EXIST");
       }
-      
-      Object.assign(game, data);
 
       if (data.genreIds) {
-        const genres = await manager.findBy(Genre, { id: In(data.genreIds) });
+        const genres = await manager.findBy<Genre>(Genre, { id: In(data.genreIds) });
         game.genres = genres;
+        delete data.genreIds;
       }
       
       if (data.platformIds) {
-        const platforms = await manager.findBy(Platform, { id: In(data.platformIds) });
+        const platforms = await manager.findBy<Platform>(Platform, { id: In(data.platformIds) });
         game.platforms = platforms;
+        delete data.platformIds;
       }
       
+      Object.assign(game, data);
+
       return await manager.save(Game, game);
     }).catch(err => {
-      console.log(err);
+      // console.log(err);
 
       if(err instanceof QueryFailedError && err.driverError && err.driverError.code === '55P03'){
         throw new InternalServerErrorException('ROW_LOCKED_TOO_LONG')
