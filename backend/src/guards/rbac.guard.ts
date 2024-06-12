@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { Reflector } from "@nestjs/core";
 import { AccountService } from "../account/account.service";
 import { AccessTypes, Permission, Roles, rolePermissionMap } from "../account/constants/rolePermissions";
-import { AccountStatus } from "src/account/constants/enums";
+import { AccountStatus } from "../account/constants/enums";
 
 @Injectable()
 export class RBACGuard implements CanActivate{

@@ -21,23 +21,24 @@ describe('AccountService', () => {
   let configService: ConfigService;
 
   const mockedManager: Partial<EntityManager> = {
-    create: jest.fn().mockImplementation((entityClass: EntityTarget<Account>, data: Object): Account => { 
-      return { id: Math.floor(Math.random() * 10000), status: AccountStatus.Active, ...data } as Account;
+    query: jest.fn(),
+    findOneBy: jest.fn().mockImplementation(async(_: EntityTarget<Account>, where: FindOptionsWhere<Account>): Promise<Account | null> => {
+      const [[key,value]]= Object.entries(where);
+      return accounts.find((_account) => _account[key] === value) || null;
     }),
-    save: jest.fn().mockImplementation((entityClass: EntityTarget<Account>, data: Account): Promise<Account> => {
-      return new Promise((resolve, reject) => {
-        accounts.push(data);
-        resolve(data);
-      });
-    }),
-    findOneBy: jest.fn().mockImplementation((entityClass: EntityTarget<Account>, where: FindOptionsWhere<Account>): Promise<Account> => {
-      return new Promise((resolve, reject) => {
-        const [[key,value]]= Object.entries(where);
-        const account = accounts.find(account => account[key] === value);
-        resolve(account);
-      })
-    }),
-    query: jest.fn()
+    create: jest.fn().mockImplementation((_: EntityTarget<Account>, entityData: Object ): Account => ({ ...entityData } as Account)),
+    save: jest.fn().mockImplementation(async(_: EntityTarget<Account>, entityData: Account): Promise<Account> => {
+      const entityIndex = accounts.indexOf(entityData);
+      const processDate = new Date();
+      if(entityIndex > -1){
+        Object.assign(accounts[entityIndex], { ...entityData, updatedAt: processDate });
+        return accounts[entityIndex];
+      } else {
+        const newGame = { id: Math.floor(Math.random() * 10000), ...entityData, createdAt: processDate, updatedAt: processDate };
+        accounts.push(newGame);
+        return newGame;
+      }
+    })
   };
 
   beforeEach(async () => {
@@ -50,13 +51,10 @@ describe('AccountService', () => {
             manager: {
               transaction: jest.fn((cb) => cb(mockedManager))
             },
-            findOne: (filter: { where: FindOptionsWhere<Account> }): Promise<Account> => {
-              return new Promise((resolve, reject) => {
-                const [[key,value]]= Object.entries(filter.where);
-                const account = accounts.find(account => account[key] === value);
-                resolve(account);
-              });
-            }
+            findOne: jest.fn().mockImplementation(async(filter: { where: FindOptionsWhere<Account> }): Promise<Account | null> => {
+              const [[key,value]]= Object.entries(filter.where);
+              return accounts.find(account => account[key] === value) || null;  
+            }) 
           }
         },
         {
@@ -93,14 +91,15 @@ describe('AccountService', () => {
     const spyOnEntityManagerSave = jest.spyOn(mockedManager, 'save');
 
     const customer = await service.signUp({ email, password }, Roles.Customer);
+    const customerEntityImitator = { email, password: customer.password, status: AccountStatus.Active, role: Roles.Customer };
 
     expect(customer).toBeDefined();
     expect(customer.role).toEqual(Roles.Customer);
     expect(spyOnTransaction).toHaveBeenCalled();
     expect(spyOnEntityManagerQuery).toHaveBeenCalled();
     expect(spyOnEntityManagerFindOneBy).toHaveBeenCalledWith(Account, { email });
-    expect(spyOnEntityManagerCreate).toHaveBeenCalledWith(Account, { email, password: customer.password, status: AccountStatus.Active, role: Roles.Customer });
-    expect(spyOnEntityManagerSave).toHaveBeenCalledWith(Account, customer);
+    expect(spyOnEntityManagerCreate).toHaveBeenCalledWith(Account, customerEntityImitator);
+    expect(spyOnEntityManagerSave).toHaveBeenCalledWith(Account, customerEntityImitator);
     expect(accounts).toHaveLength(1);
   });
 
@@ -112,14 +111,15 @@ describe('AccountService', () => {
     const spyOnEntityManagerSave = jest.spyOn(mockedManager, 'save');
 
     const admin = await service.signUp({ email, password }, Roles.Admin);
+    const adminEntityImitator = { email, password: admin.password, status: AccountStatus.Active, role: Roles.Admin };
 
     expect(admin).toBeDefined();
     expect(admin.role).toEqual(Roles.Admin);
     expect(spyOnTransaction).toHaveBeenCalled();
     expect(spyOnEntityManagerQuery).toHaveBeenCalled();
     expect(spyOnEntityManagerFindOneBy).toHaveBeenCalledWith(Account, { email });
-    expect(spyOnEntityManagerCreate).toHaveBeenCalledWith(Account, { email, password: admin.password, status: AccountStatus.Active, role: Roles.Admin });
-    expect(spyOnEntityManagerSave).toHaveBeenCalledWith(Account, admin);
+    expect(spyOnEntityManagerCreate).toHaveBeenCalledWith(Account, adminEntityImitator);
+    expect(spyOnEntityManagerSave).toHaveBeenCalledWith(Account, adminEntityImitator);
     expect(accounts).toHaveLength(1);
   });
 

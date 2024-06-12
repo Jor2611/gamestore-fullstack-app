@@ -33,7 +33,7 @@ export const JWTExpirationMap = {
   'JWT_REMEMBER_EXPIRATION': '7d'
 };
 
-export const mockGames = (genres: Array<Object>, platforms: Array<Object>, size: number) => {
+export const mockGames = (genres: Array<Object>, platforms: Array<Object>, size: number = 1) => {
   const gameCollection = [];
 
   for(let i=1; i<=size; i++){
@@ -72,4 +72,41 @@ export const mockPlatforms = [
   { id: 3, name: "PlayStation 4", label: "PlayStation 4", value: "playstation4", icon: "https://media.rawg.io/media/games/960/960b601d9541cec776c5fa42a00bf6c4.jpg" },
   { id: 4, name: "Xbox One", label: "Xbox One", value: "xbox-one", icon: "https://media.rawg.io/media/games/562/562553814dd54e001a541e4ee83a591c.jpg" },
   { id: 5, name: "Xbox Series S/X", label: "Xbox Series S/X", value: "xbox-series-x", icon: "https://media.rawg.io/media/games/26d/26d4437715bee60138dab4a7c8c59c92.jpg" }
-]
+];
+
+// export const EntityManagerMock = <T extends Account | Game>(collection: T[], relations: any = {}): any => {
+//   return  {
+//     query: jest.fn(),
+//     findOne: jest.fn().mockImplementation(async(_: EntityTarget<T>, opts: FindOneOptions<T>): Promise<T | null> => {
+//       return collection.find((_entity) => _entity.id === opts.where['id']) || null;
+//     }),
+//     findOneBy: jest.fn().mockImplementation(async(_: EntityTarget<T>, where: FindOptionsWhere<T>): Promise<T | null> => {
+//       const [[key,value]]= Object.entries(where);
+//       return collection.find((_entity) => _entity[key] === value) || null;
+//     }),
+//     findBy: jest.fn().mockImplementation(async(entityClass: EntityTarget<any>, where: FindOptionsWhere<any>): Promise<any[]> => {
+//       if(entityClass === Platform){
+//         const platformIds = (where.id as any)._value; 
+//         return relations.platforms.filter(_platform => platformIds.includes(_platform.id)); 
+//       } else if(entityClass === Genre){
+//         const genreIds = (where.id as any)._value; 
+//         return relations.genres.filter(_genre => genreIds.includes(_genre.id));
+//       } else {
+//         return [];
+//       }
+//     }),
+//     create: jest.fn().mockImplementation((_: EntityTarget<T>, entityData: Object ): T => ({ ...entityData } as T)),
+//     save: jest.fn().mockImplementation(async(_: EntityTarget<T>, entityData: T): Promise<T> => {
+//       const entityIndex = collection.indexOf(entityData);
+//       const processDate = new Date();
+//       if(entityIndex > -1){
+//         Object.assign(collection[entityIndex], { ...entityData, updatedAt: processDate });
+//         return collection[entityIndex];
+//       } else {
+//         const newGame = { id: Math.floor(Math.random() * 10000), ...entityData, createdAt: processDate, updatedAt: processDate };
+//         collection.push(newGame);
+//         return newGame;
+//       }
+//     })
+//   }
+// };

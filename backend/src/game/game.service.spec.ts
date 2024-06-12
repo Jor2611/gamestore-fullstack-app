@@ -44,34 +44,34 @@ describe('GameService', () => {
   };
 
   const mockedManager: Partial<EntityManager> = {
-    findOne: jest.fn().mockImplementation(async(entityClass: EntityTarget<Game>, filter: FindOneOptions<Game>): Promise<Game> => {
-      return games.find((_game) => _game.id === filter.where['id']) || null;
+    query: jest.fn(),
+    findOne: jest.fn().mockImplementation(async(_: EntityTarget<Game>, opts: FindOneOptions<Game>): Promise<Game> => {
+      return games.find((_game) => _game.id === opts.where['id']) || null;
     }),
-    findBy: jest.fn().mockImplementation(async <T extends Genre | Platform>(entityClass: EntityTarget<T>, filter: FindOptionsWhere<T>): Promise<T[]> => {
+    findBy: jest.fn().mockImplementation(async <T extends Genre | Platform>(entityClass: EntityTarget<T>, where: FindOptionsWhere<T>): Promise<T[]> => {
       if(entityClass === Platform){
-        const platformIds = (filter.id as any)._value; 
+        const platformIds = (where.id as any)._value; 
         return mockPlatforms.filter(_platform => platformIds.includes(_platform.id)) as T[]; 
       } else if(entityClass === Genre){
-        const genreIds = (filter.id as any)._value; 
+        const genreIds = (where.id as any)._value; 
         return mockGenres.filter(_genre => genreIds.includes(_genre.id)) as T[];
       } else {
         return [];
       }
     }),
-    create: jest.fn().mockImplementation((entityClass: EntityTarget<Game>, data: Object): Game => ({ ...data } as Game)),
-    save: jest.fn().mockImplementation(async(entityClass: EntityTarget<Game>, game: Game): Promise<Game> => {
-      const gameIndex = games.indexOf(game);
-      if(gameIndex > -1){
-        Object.assign(games[gameIndex], { ...game, updatedAt: new Date() });
-        return games[gameIndex];
-      }else {
-        const initialDate = new Date();
-        const newGame = { id: Math.floor(Math.random() * 10000), ...game, createdAt: initialDate, updatedAt: initialDate };
+    create: jest.fn().mockImplementation((_: EntityTarget<Game>, entityData: Object): Game => ({ ...entityData } as Game)),
+    save: jest.fn().mockImplementation(async(_: EntityTarget<Game>, entityData: Game): Promise<Game> => {
+      const entityIndex = games.indexOf(entityData);
+      const processDate = new Date();
+      if(entityIndex > -1){
+        Object.assign(games[entityIndex], { ...entityData, updatedAt: processDate });
+        return games[entityIndex];
+      } else {
+        const newGame = { id: Math.floor(Math.random() * 10000), ...entityData, createdAt: processDate, updatedAt: processDate };
         games.push(newGame);
         return newGame;
       }
-    }),
-    query: jest.fn()
+    })
   };
 
   beforeEach(async () => {
@@ -85,8 +85,8 @@ describe('GameService', () => {
               transaction: jest.fn((cb) => cb(mockedManager))
             },
             createQueryBuilder: jest.fn().mockImplementation((_:string) => mockQueryBuilder),
-            findOne: jest.fn().mockImplementation(async(filter: FindOneOptions<Game>): Promise<Game> => {
-              return games.find((_game) => _game.id === filter.where['id']) || null;
+            findOne: jest.fn().mockImplementation(async(opts: FindOneOptions<Game>): Promise<Game> => {
+              return games.find((_game) => _game.id === opts.where['id']) || null;
             }),
             create: jest.fn().mockImplementation((data): Game => data),
             save: jest.fn().mockImplementation(async(game: Game) => {
