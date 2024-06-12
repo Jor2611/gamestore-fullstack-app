@@ -16,7 +16,13 @@ export class GameService {
   ){}
 
   async findOne(id: number){
-    return this.repository.findOne({ where: { id }, relations: ['platforms', 'genres'] });
+    const game = await this.repository.findOne({ where: { id }, relations: ['platforms', 'genres'] });
+    
+    if(!game) {
+      throw new NotFoundException("GAME_DOESN'T_EXIST");
+    }
+
+    return game;
   }
 
   async create(data: CreateGameDto){
@@ -59,9 +65,7 @@ export class GameService {
       
       const game = await manager.findOne(Game, { where: { id }, relations: ['genres', 'platforms'] });
 
-      if (!game) {
-        throw new NotFoundException("GAME_DOESN'T_EXIST");
-      }
+      if (!game) throw new NotFoundException("GAME_DOESN'T_EXIST");
 
       if (data.genreIds) {
         const genres = await manager.findBy<Genre>(Genre, { id: In(data.genreIds) });
@@ -95,7 +99,7 @@ export class GameService {
     try{
       const game = await this.repository.findOne({ where: { id } });
       
-      if(!game) throw new NotFoundException('');
+      if(!game) throw new NotFoundException("GAME_DOESN'T_EXIST");
 
       return this.repository.remove(game);
     }catch(err){

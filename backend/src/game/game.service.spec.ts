@@ -170,17 +170,13 @@ describe('GameService', () => {
     expect(spyOnGameFindOne).toHaveBeenCalledWith({ where: { id }, relations: ['platforms', 'genres'] });
   });
 
-  it('should return null when provided non-existing game id to find one game method', async() => {
+  it('should throw a NotFoundException when provided non-existing game id to find one game method', async() => {
     const spyOnGameFindOne = jest.spyOn(repository, 'findOne');
-    const [genreIds, platformIds] = [[1,2,3],[2,1,5]];
 
-    const { id } = await service.create({ ...mockGame, genreIds, platformIds });
-    const foundGame = await service.findOne(id+1);
+    await expect(service.findOne(15)).rejects.toThrow(NotFoundException);
 
-    expect(foundGame).toBeNull();
-    expect(games).toHaveLength(1);
     expect(spyOnGameFindOne).toHaveBeenCalledTimes(1);
-    expect(spyOnGameFindOne).toHaveBeenCalledWith({ where: { id: id+1 }, relations: ['platforms', 'genres'] });
+    expect(spyOnGameFindOne).toHaveBeenCalledWith({ where: { id: 15 }, relations: ['platforms', 'genres'] });
   });
 
   it('should successfully create a game', async() => {

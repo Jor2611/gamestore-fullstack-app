@@ -18,7 +18,7 @@ export class AccountController {
     if(!req.query.token){
       return { success: false, msg: 'TOKEN_NOT_PROVIDED' };
     }
-    return { msg: 'TOKEN_VERIFIED', id: req.decoded.id, profile_id: req.decoded.profile_id || null };
+    return { msg: 'TOKEN_VERIFIED', id: req.decoded?.id, profile_id: req.decoded?.profile_id || null };
   }
   
   @Post('/basement/token')

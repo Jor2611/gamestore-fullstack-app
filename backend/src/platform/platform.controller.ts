@@ -6,7 +6,7 @@ export class PlatformController {
   constructor(private readonly platformService: PlatformService){}
 
   @Get('')
-  fetch(){
+  async fetch(){
     return this.platformService.find();
   }
 }
