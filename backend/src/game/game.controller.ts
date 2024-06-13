@@ -39,7 +39,7 @@ export class GameController {
   @Patch(':id')
   @ACL('game','update')
   @Serialize(GameResponseDto)
-  async update(@Param('id', new ParseIntPipe()) id:number, @Body() body: UpdateGameDto){
+  async update(@Param('id', new ParseIntPipe()) id: number, @Body() body: UpdateGameDto){
     const result = await this.gameService.update(id,body);
     return { msg: 'GAME_UPDATED', data: result };
   }
@@ -47,9 +47,8 @@ export class GameController {
   @Delete(':id')
   @HttpCode(204)
   @ACL('game', 'delete')
-  @Serialize(GameResponseDto)
   async remove(@Param('id', new ParseIntPipe()) id: number){
-    const result = await this.gameService.delete(id);
-    return { msg: 'GAME_REMOVED', data: result };
+    await this.gameService.delete(id);
+    return {};
   }
 }

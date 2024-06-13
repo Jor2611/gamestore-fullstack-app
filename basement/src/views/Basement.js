@@ -18,9 +18,9 @@ export default function BasementLayout(){
   useEffect(() => {
     async function fetchLayoutData(){
       try{
-        const genres = await loadGenres();
-        const platforms = await loadPlatforms();
-        loadLayoutData({ genres, platforms });
+        const genresResponse = await loadGenres();
+        const platformsResponse = await loadPlatforms();
+        loadLayoutData({ genres: genresResponse.data, platforms: platformsResponse.data });
       }catch(err){
         console.log(err);
       }

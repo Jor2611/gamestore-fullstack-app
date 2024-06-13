@@ -7,6 +7,7 @@ export class GenreController {
 
   @Get('')
   async fetch(){
-    return this.genreService.find();
+    const result = await this.genreService.find();
+    return { success: true, msg: 'GENRES_FETCHED', data: result };
   }
 }

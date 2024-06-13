@@ -36,13 +36,15 @@ describe('PlatformController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should return all platforms', async() => {
-    const spyOnPlatformsFind = jest.spyOn(service, 'find');
+  it('should return all genres', async() => {
+    const spyOnGenresFind = jest.spyOn(service, 'find');
     platforms = mockPlatforms as Platform[];
 
-    const result = await controller.fetch();
+    const { success, msg, data } = await controller.fetch();
 
-    expect(result).toHaveLength(platforms.length);
-    expect(spyOnPlatformsFind).toHaveBeenCalledTimes(1);
+    expect(success).toBe(true);
+    expect(msg).toEqual('PLATFORMS_FETCHED');
+    expect(data).toHaveLength(platforms.length);
+    expect(spyOnGenresFind).toHaveBeenCalledTimes(1);
   })
 });

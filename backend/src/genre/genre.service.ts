@@ -8,7 +8,7 @@ import { Genre } from './genre.entity';
 export class GenreService {
   constructor(@InjectRepository(Genre) private readonly repo: Repository<Genre>){}
 
-  find(){
+  async find(){
     return this.repo.find();
   }
 }

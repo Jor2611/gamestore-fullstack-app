@@ -40,9 +40,11 @@ describe('GenreController', () => {
     const spyOnGenresFind = jest.spyOn(service, 'find');
     genres = mockGenres as Genre[];
 
-    const result = await controller.fetch();
+    const { success, msg, data } = await controller.fetch();
 
-    expect(result).toHaveLength(genres.length);
+    expect(success).toBe(true);
+    expect(msg).toEqual('GENRES_FETCHED');
+    expect(data).toHaveLength(genres.length);
     expect(spyOnGenresFind).toHaveBeenCalledTimes(1);
   })
 });

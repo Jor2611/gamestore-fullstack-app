@@ -42,7 +42,7 @@ export const mockGames = (genres: Array<Object>, platforms: Array<Object>, size:
       name: `Game ${i}`, 
       publisher: `Game Publisher ${i}`, 
       released: `2013-09-${i}`, 
-      description: `Game Description ${i}`, 
+      description: `Lorem ipsum dolor sit amet, consectetur cras amet.  ${i}`, 
       slug: `game_slug_${i}`, 
       background_image: `https://image_${i}.com`, 
       clip: `https://youtube.com/1das5d165awd${i}`, 

@@ -158,12 +158,9 @@ describe('GameController', () => {
     const newGameData = { ...gameData, genreIds: [1,2,3], platformIds: [2,3,4] };
     
     const createdGame = await controller.create(newGameData);
-    const { msg, data } = await controller.remove(createdGame.data.id);
+    await controller.remove(createdGame.data.id);
 
     expect(spyOnGameDelete).toHaveBeenCalledTimes(1);
     expect(spyOnGameDelete).toHaveBeenCalledWith(createdGame.data.id);
-    expect(msg).toEqual('GAME_REMOVED');
-    expect(data).toBeDefined();
-    expect(data.id).toEqual(createdGame.data.id);
   });
 });

@@ -7,6 +7,7 @@ export class PlatformController {
 
   @Get('')
   async fetch(){
-    return this.platformService.find();
+    const result = await this.platformService.find();
+    return { success: true, msg: 'PLATFORMS_FETCHED', data: result };
   }
 }

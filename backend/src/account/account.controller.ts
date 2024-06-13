@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Req, UnauthorizedException } from '@nestjs/common';
 import { Request } from 'express';
 import { AccountService } from './account.service';
 import { Roles } from './constants/rolePermissions';
@@ -15,10 +15,10 @@ export class AccountController {
 
   @Get('/checkToken')
   async checkToken(@Req() req: Request){
-    if(!req.query.token){
-      return { success: false, msg: 'TOKEN_NOT_PROVIDED' };
+    if(!req.query.token && !req.decoded){
+      throw new UnauthorizedException('TOKEN_NOT_PROVIDED')
     }
-    return { msg: 'TOKEN_VERIFIED', id: req.decoded?.id, profile_id: req.decoded?.profile_id || null };
+    return { msg: 'TOKEN_VERIFIED', data: { id: req.decoded?.id, profile_id: req.decoded?.profile_id || null } };
   }
   
   @Post('/basement/token')

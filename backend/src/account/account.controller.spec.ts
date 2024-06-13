@@ -6,7 +6,7 @@ import { Roles } from './constants/rolePermissions';
 import { Account } from './account.entity';
 import { SignInDto } from './dtos/signin.dto';
 import { mockAccount } from '../../test/mocks';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { Request } from 'express';
 
 
@@ -72,20 +72,17 @@ describe('AccountController', () => {
       decoded: { id: 123, profile_id: 152, email, role: Roles.Admin, iat: 123564, exp: 1535 }
     } as unknown as Request;
 
-    const { msg, id, profile_id } = await controller.checkToken(request);
+    const { msg, data } = await controller.checkToken(request);
   
     expect(msg).toEqual('TOKEN_VERIFIED');
-    expect(id).toEqual(request.decoded.id);
-    expect(profile_id).toEqual(request.decoded.profile_id);
+    expect(data.id).toEqual(request.decoded.id);
+    expect(data.profile_id).toEqual(request.decoded.profile_id);
   });
 
   it('should return unsuccessful response when token not provided', async() => {
     const request = { query: { token: '' } } as unknown as Request;
 
-    const { msg, success } = await controller.checkToken(request);
-  
-    expect(msg).toEqual('TOKEN_NOT_PROVIDED');
-    expect(success).toBe(false);
+    await expect(controller.checkToken(request)).rejects.toThrow(UnauthorizedException);
   });
 
   it('should signup a new admin account', async() => {
