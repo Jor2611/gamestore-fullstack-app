@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import {
   Button,
   Flex,
@@ -29,26 +29,34 @@ function Games() {
   const [selectedForDeletion, setSelectedForDeletion] = useState(null);
 
 	const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { isOpen: isDeleteDialogOpen, onOpen: openDeleteDialog, onClose: closeDeleteDialog } = useDisclosure();
 
-  const { data: fetchedGames, isLoading, isRefetching, isSuccess } = useQuery({
+  const { data: fetchedGames, isSuccess } = useQuery({
     queryKey: ["games", currentPage],
     queryFn: () => fetchGameRows(currentPage, PAGE_SIZE),
     keepPreviousData: true
   });
+
+  const deleteGameMutation = useMutation({
+    mutationFn: (id) => deleteGame(id)
+  })
 
   const navigateToNew = useCallback(() => {
     navigate('/games/new');
   },[]);
   
   const deleteGameHandler = async(id) => {
-    try{
-      await deleteGame(id);
-      closeDeleteDialog();
-      setSelectedForDeletion(null);   
-    }catch(err){
-      console.log(err);
-    }
+    deleteGameMutation.mutate(id, {
+      onError: (err) => {
+        console.log(err);
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries("games");
+        closeDeleteDialog();
+        setSelectedForDeletion(null);
+      }
+    });
   };
 
   const deleteDialogHandler = useCallback((game) => {
