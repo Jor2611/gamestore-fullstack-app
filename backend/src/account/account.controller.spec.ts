@@ -5,7 +5,7 @@ import { SignUpAdminDto } from './dtos/signup-admin.dto';
 import { Roles } from './constants/rolePermissions';
 import { Account } from './account.entity';
 import { SignInDto } from './dtos/signin.dto';
-import { mockAccount } from '../../test/mocks';
+import { mockAccount } from '../../test/mocks/helpers';
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { Request } from 'express';
 

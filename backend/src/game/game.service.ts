@@ -55,7 +55,7 @@ export class GameService {
 
     const games = await queryBuilder.getMany();
     const count = await queryBuilder.getCount();
-  
+    
     return { games, count };
   }
 

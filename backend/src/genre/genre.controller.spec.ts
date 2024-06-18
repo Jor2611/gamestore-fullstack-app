@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { GenreController } from './genre.controller';
 import { GenreService } from './genre.service';
 import { Genre } from './genre.entity';
-import { mockGenres } from '../../test/mocks';
+import { mockGenres } from '../../test/mocks/helpers';
 
 let genres: Genre[] = [];
 

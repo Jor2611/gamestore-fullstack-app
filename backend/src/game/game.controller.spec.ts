@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { GameController } from './game.controller';
 import { GameService } from './game.service';
 import { Game } from './game.entity';
-import { mockGames, mockGenres, mockPlatforms } from '../../test/mocks';
+import { mockGames, mockGenres, mockPlatforms } from '../../test/mocks/helpers';
 import { CreateGameDto } from './dtos/create-game.dto';
 import { Genre } from '../genre/genre.entity';
 import { Platform } from '../platform/platform.entity';

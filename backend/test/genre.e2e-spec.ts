@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { DataSource } from 'typeorm';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
-import { DataSource } from 'typeorm';
+
 
 describe('Genre (e2e)', () => {
   let app: INestApplication;

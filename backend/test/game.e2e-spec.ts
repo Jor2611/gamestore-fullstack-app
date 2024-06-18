@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
-import { mockAccount, mockGames, mockGenres, mockPlatforms } from './mocks';
+import { mockAccount, provideGameDetails } from './mocks/helpers';
 
 describe('Game (e2e)', () => {
   let app: INestApplication;
@@ -56,32 +56,7 @@ describe('Game (e2e)', () => {
     return token;
   };
 
-  const provideGameDetails = () => {
-    const { 
-      id, 
-      genres, 
-      platforms, 
-      createdAt, 
-      updatedAt, 
-      ...gameData 
-    } = mockGames(mockGenres, mockPlatforms, 1)[0];
-    
-    const newGameDetails = {
-      ...gameData,
-      rating: parseFloat(gameData.rating),
-      metacritic: parseFloat(gameData.metacritic),
-      platformIds: [1, 2, 3],
-      genreIds: [2, 4, 5],
-    };
-
-    const gameUpdateDetails = { 
-      name: 'Updated Game', 
-      platformIds: [4,5], 
-      genreIds: [1,3] 
-    };
-
-    return { newGameDetails, gameUpdateDetails };
-  };
+ 
 
   /**
    * Tests

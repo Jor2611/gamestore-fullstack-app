@@ -1,11 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { DataSource } from 'typeorm';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { SignUpAdminDto } from './../src/account/dtos/signup-admin.dto';
 import { Roles } from './../src/account/constants/rolePermissions';
-import { mockAccount } from './mocks';
-import { DataSource } from 'typeorm';
+import { mockAccount } from './mocks/helpers';
+
 
 const sampleAccount = { email: mockAccount.email, password: mockAccount.password };
 

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PlatformController } from './platform.controller';
 import { PlatformService } from './platform.service';
 import { Platform } from './platform.entity';
-import { mockPlatforms } from '../../test/mocks';
+import { mockPlatforms } from '../../test/mocks/helpers';
 
 let platforms: Platform[] = [];
 

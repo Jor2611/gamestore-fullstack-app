@@ -3,14 +3,14 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GenreService } from './genre.service';
 import { Genre } from './genre.entity';
-import { mockGenres } from '../../test/mocks';
+import { mockGenres } from '../../test/mocks/helpers';
+import { RepositoryMock } from '../../test/mocks/RepositoryBuilder';
 
-let genres: Genre[] = [];
-let mockedGenreList: Genre[] = []; 
 
 describe('GenreService', () => {
   let service: GenreService;
   let repository: Repository<Genre>;
+  const repositoryMock = new RepositoryMock<Genre>(Genre).build();
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -18,21 +18,19 @@ describe('GenreService', () => {
         GenreService,
         {
           provide: getRepositoryToken(Genre),
-          useValue: {
-            find: jest.fn().mockReturnValue(mockedGenreList)
-          }
+          useValue: repositoryMock
         }
       ],
     }).compile();
 
-    mockedGenreList = mockGenres as Genre[];
+    repositoryMock.seedCollections({ genres: mockGenres });
     service = module.get<GenreService>(GenreService);
     repository = module.get<Repository<Genre>>(getRepositoryToken(Genre));
   });
 
   afterEach(() => {
-    genres = [];
     jest.clearAllMocks();
+    repositoryMock.resetData();
   })
 
   it('should be defined', () => {
@@ -43,9 +41,10 @@ describe('GenreService', () => {
     const spyOnGenreFind = jest.spyOn(repository, 'find');
 
     const fetchedGenres = await service.find();
+    const collection = await repositoryMock.collection();
 
     expect(spyOnGenreFind).toHaveBeenCalled();
     expect(fetchedGenres).toBeInstanceOf(Array);
-    expect(fetchedGenres).toHaveLength(mockedGenreList.length);
+    expect(fetchedGenres).toHaveLength(collection.length);
   });
 });

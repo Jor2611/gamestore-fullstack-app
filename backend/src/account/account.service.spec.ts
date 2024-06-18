@@ -1,17 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
-import { getRepositoryToken } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { scrypt as _scrypt } from 'crypto';
-import { EntityManager, EntityTarget, FindOptionsWhere, Repository } from 'typeorm';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Account } from './account.entity';
 import { AccountService } from './account.service';
 import { Roles } from './constants/rolePermissions';
-import { JWTExpirationMap, mockAccount, mockConfigService, mockJwtService } from '../../test/mocks';
 import { AccountStatus, JWTEexpirations } from './constants/enums';
+import { mockAccount } from '../../test/mocks/helpers';
+import { JwtServiceMock, JWTExpirationMap } from '../../test/mocks/JWTService';
+import { ConfigServiceMock } from '../../test/mocks/ConfigService';
+import { RepositoryMock } from '../../test/mocks/RepositoryBuilder';
 
-let accounts: Account[] = [];
 const { email, wrongEmail, password, wrongPassword } = mockAccount;
 
 describe('AccountService', () => {
@@ -20,26 +21,7 @@ describe('AccountService', () => {
   let repository: Repository<Account>;
   let configService: ConfigService;
 
-  const mockedManager: Partial<EntityManager> = {
-    query: jest.fn(),
-    findOneBy: jest.fn().mockImplementation(async(_: EntityTarget<Account>, where: FindOptionsWhere<Account>): Promise<Account | null> => {
-      const [[key,value]]= Object.entries(where);
-      return accounts.find((_account) => _account[key] === value) || null;
-    }),
-    create: jest.fn().mockImplementation((_: EntityTarget<Account>, entityData: Object ): Account => ({ ...entityData } as Account)),
-    save: jest.fn().mockImplementation(async(_: EntityTarget<Account>, entityData: Account): Promise<Account> => {
-      const entityIndex = accounts.indexOf(entityData);
-      const processDate = new Date();
-      if(entityIndex > -1){
-        Object.assign(accounts[entityIndex], { ...entityData, updatedAt: processDate });
-        return accounts[entityIndex];
-      } else {
-        const newGame = { id: Math.floor(Math.random() * 10000), ...entityData, createdAt: processDate, updatedAt: processDate };
-        accounts.push(newGame);
-        return newGame;
-      }
-    })
-  };
+  const repositoryMock = new RepositoryMock<Account>(Account).withEntityManager().build();
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -47,23 +29,15 @@ describe('AccountService', () => {
         AccountService,
         {
           provide: getRepositoryToken(Account),
-          useValue: {
-            manager: {
-              transaction: jest.fn((cb) => cb(mockedManager))
-            },
-            findOne: jest.fn().mockImplementation(async(filter: { where: FindOptionsWhere<Account> }): Promise<Account | null> => {
-              const [[key,value]]= Object.entries(filter.where);
-              return accounts.find(account => account[key] === value) || null;  
-            }) 
-          }
+          useValue: repositoryMock
         },
         {
           provide: JwtService,
-          useValue: mockJwtService
+          useValue: JwtServiceMock
         },
         {
           provide: ConfigService,
-          useValue: mockConfigService
+          useValue: ConfigServiceMock
         }
       ],
     }).compile();
@@ -72,11 +46,12 @@ describe('AccountService', () => {
     repository = module.get<Repository<Account>>(getRepositoryToken(Account));
     jwtService = module.get<JwtService>(JwtService);
     configService = module.get<ConfigService>(ConfigService);
+    repositoryMock.seedCollections({ accounts: [] })
   });
 
   afterEach(()=> {
-    accounts = [];
     jest.clearAllMocks();
+    repositoryMock.resetData();
   });
 
   it('should be defined', () => {
@@ -85,13 +60,15 @@ describe('AccountService', () => {
   
   it('should create and save a Customer account successfully', async () => {
     const spyOnTransaction = jest.spyOn(repository.manager, 'transaction');
-    const spyOnEntityManagerQuery = jest.spyOn(mockedManager, 'query');
-    const spyOnEntityManagerFindOneBy = jest.spyOn(mockedManager, 'findOneBy');
-    const spyOnEntityManagerCreate = jest.spyOn(mockedManager, 'create');
-    const spyOnEntityManagerSave = jest.spyOn(mockedManager, 'save');
+    const entityManagerMock = repositoryMock.entityManagerMock;
+    const spyOnEntityManagerQuery = jest.spyOn(entityManagerMock, 'query');
+    const spyOnEntityManagerFindOneBy = jest.spyOn(entityManagerMock, 'findOneBy');
+    const spyOnEntityManagerCreate = jest.spyOn(entityManagerMock, 'create');
+    const spyOnEntityManagerSave = jest.spyOn(entityManagerMock, 'save');
 
     const customer = await service.signUp({ email, password }, Roles.Customer);
     const customerEntityImitator = { email, password: customer.password, status: AccountStatus.Active, role: Roles.Customer };
+    const collection = await repositoryMock.collection();
 
     expect(customer).toBeDefined();
     expect(customer.role).toEqual(Roles.Customer);
@@ -100,18 +77,20 @@ describe('AccountService', () => {
     expect(spyOnEntityManagerFindOneBy).toHaveBeenCalledWith(Account, { email });
     expect(spyOnEntityManagerCreate).toHaveBeenCalledWith(Account, customerEntityImitator);
     expect(spyOnEntityManagerSave).toHaveBeenCalledWith(Account, customerEntityImitator);
-    expect(accounts).toHaveLength(1);
+    expect(collection).toHaveLength(1);
   });
 
   it('should create and save a Admin account successfully', async () => {
     const spyOnTransaction = jest.spyOn(repository.manager, 'transaction');
-    const spyOnEntityManagerQuery = jest.spyOn(mockedManager, 'query');
-    const spyOnEntityManagerFindOneBy = jest.spyOn(mockedManager, 'findOneBy');
-    const spyOnEntityManagerCreate = jest.spyOn(mockedManager, 'create');
-    const spyOnEntityManagerSave = jest.spyOn(mockedManager, 'save');
+    const entityManagerMock = repositoryMock.entityManagerMock;
+    const spyOnEntityManagerQuery = jest.spyOn(entityManagerMock, 'query');
+    const spyOnEntityManagerFindOneBy = jest.spyOn(entityManagerMock, 'findOneBy');
+    const spyOnEntityManagerCreate = jest.spyOn(entityManagerMock, 'create');
+    const spyOnEntityManagerSave = jest.spyOn(entityManagerMock, 'save');
 
     const admin = await service.signUp({ email, password }, Roles.Admin);
     const adminEntityImitator = { email, password: admin.password, status: AccountStatus.Active, role: Roles.Admin };
+    const collection = await repositoryMock.collection();
 
     expect(admin).toBeDefined();
     expect(admin.role).toEqual(Roles.Admin);
@@ -120,7 +99,7 @@ describe('AccountService', () => {
     expect(spyOnEntityManagerFindOneBy).toHaveBeenCalledWith(Account, { email });
     expect(spyOnEntityManagerCreate).toHaveBeenCalledWith(Account, adminEntityImitator);
     expect(spyOnEntityManagerSave).toHaveBeenCalledWith(Account, adminEntityImitator);
-    expect(accounts).toHaveLength(1);
+    expect(collection).toHaveLength(1);
   });
 
   it('should create a new account with encrypted password', async () => {
@@ -135,10 +114,11 @@ describe('AccountService', () => {
 
   it('should throw a BadRequestException when creating a new account with an existing email', async() => {
     const spyOnTransaction = jest.spyOn(repository.manager, 'transaction');
-    const spyOnEntityManagerQuery = jest.spyOn(mockedManager, 'query');
-    const spyOnEntityManagerFindOneBy = jest.spyOn(mockedManager, 'findOneBy');
-    const spyOnEntityManagerCreate = jest.spyOn(mockedManager, 'create');
-    const spyOnEntityManagerSave = jest.spyOn(mockedManager, 'save');
+    const entityManagerMock = repositoryMock.entityManagerMock;
+    const spyOnEntityManagerQuery = jest.spyOn(entityManagerMock, 'query');
+    const spyOnEntityManagerFindOneBy = jest.spyOn(entityManagerMock, 'findOneBy');
+    const spyOnEntityManagerCreate = jest.spyOn(entityManagerMock, 'create');
+    const spyOnEntityManagerSave = jest.spyOn(entityManagerMock, 'save');
     
     await service.signUp({ email, password }, Roles.Customer);
     await expect(service.signUp({ email, password }, Roles.Customer))
@@ -170,7 +150,6 @@ describe('AccountService', () => {
     expect(spyOnAsignJWT).toHaveBeenCalledTimes(1);
     expect(spyOnAsignJWT).toHaveBeenCalledWith(JWTPayloadImitation, { expiresIn: JWTExpirationMap[JWTEexpirations.REGULAR] });
   });
-
 
   it('should return a token when used signin with correct customer credentials with remembering option', async() => {
     const spyOnFindOne = jest.spyOn(repository, 'findOne');
@@ -309,7 +288,7 @@ describe('AccountService', () => {
     expect(spyOnAsignJWT).not.toHaveBeenCalled();
   });
 
-  it('should throw a BadRequestException if signed in with wrong deleted account', async() => {
+  it('should throw a BadRequestException if signed in with deleted account', async() => {
     const spyOnFindOne = jest.spyOn(repository, 'findOne');
     const spyOnAsignJWT = jest.spyOn(jwtService, 'signAsync');
     const spyOnConfigJWTExpiration = jest.spyOn(configService, 'get');
