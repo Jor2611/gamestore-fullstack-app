@@ -36,6 +36,7 @@ services:
       - PG_USERNAME
       - PG_PASSWORD
       - PG_DATABASE
+      - TRX_LOCK_TIMEOUT
       - JWT_SECRET
       - JWT_EXPIRATION
       - JWT_ADMIN_EXPIRATION

@@ -47,6 +47,7 @@ To see current stage of the application follow the steps below.
       PG_USERNAME=[postgres-username]
       PG_PASSWORD=[postgres-password]
       PG_DATABASE=[postgres-dbname]
+      TRX_LOCK_TIMEOUT=5s
       JWT_SECRET=[secret-for-jwt]
       JWT_EXPIRATION=30d
       JWT_ADMIN_EXPIRATION=4h

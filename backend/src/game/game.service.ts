@@ -1,7 +1,9 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Game } from './game.entity';
 import { Repository, In, EntityManager, QueryFailedError } from 'typeorm';
+import { Transactional } from '../decorators/transactional.decorator';
+import { Game } from './game.entity';
 import { CreateGameDto } from './dtos/create-game.dto';
 import { Genre } from '../genre/genre.entity';
 import { Platform } from '../platform/platform.entity';
@@ -12,7 +14,8 @@ export class GameService {
   constructor(
     @InjectRepository(Game) private readonly repository: Repository<Game>,
     @InjectRepository(Genre) private readonly genreRepository: Repository<Genre>,
-    @InjectRepository(Platform) private readonly platformRepository: Repository<Platform>
+    @InjectRepository(Platform) private readonly platformRepository: Repository<Platform>,
+    private readonly configService: ConfigService
   ){}
 
   async findOne(id: number){
@@ -59,10 +62,9 @@ export class GameService {
     return { games, count };
   }
 
-  async update(id: number, data: Partial<UpdateGameDto>){
-    return await this.repository.manager.transaction(async (manager: EntityManager) => {
-      await manager.query(`SET lock_timeout = '20s';`);
-      
+  @Transactional({ isolation: 'REPEATABLE READ' })
+  async update(id: number, data: Partial<UpdateGameDto>, manager?: EntityManager){
+    try{ 
       const game = await manager.findOne(Game, { where: { id }, relations: ['genres', 'platforms'] });
 
       if (!game) throw new NotFoundException("GAME_DOESN'T_EXIST");
@@ -82,17 +84,13 @@ export class GameService {
       Object.assign(game, data);
 
       return await manager.save(Game, game);
-    }).catch(err => {
-      // console.log(err);
-
-      if(err instanceof QueryFailedError && err.driverError && err.driverError.code === '55P03'){
-        throw new InternalServerErrorException('ROW_LOCKED_TOO_LONG')
-      } else if(err instanceof InternalServerErrorException){
+    }catch(err){
+      if(err instanceof InternalServerErrorException){
         throw new InternalServerErrorException('SERVER_ERROR')
       }
 
       throw err;
-    });
+    };
   }
 
   async delete(id: number){
